@@ -1,0 +1,33 @@
+{
+  "name": "thu-vien-yongin-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Thu vien Yongin Library Management System",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "migrate": "psql -d thuvienyongin -f src/database/migrations/001_schema.sql",
+    "seed": "node src/database/seeds/run.js",
+    "test": "jest --coverage"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^9.4.2",
+    "@supabase/supabase-js": "^2.108.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "express-validator": "^7.2.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.1.1",
+    "pg": "^8.13.0",
+    "xlsx": "^0.18.5",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.4"
+  }
+}

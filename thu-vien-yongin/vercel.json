@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "backend",
+  "installCommand": "cd backend && npm install",
+  "functions": {
+    "api/**/*.js": { "runtime": "@vercel/node@3" }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "backend/src/app.js" },
+    { "src": "/librarian/assets/(.*)", "dest": "frontend/apps/librarian/dist/assets/$1" },
+    { "src": "/librarian/(.*)", "dest": "frontend/apps/librarian/dist/index.html" },
+    { "src": "/admin/assets/(.*)", "dest": "frontend/apps/admin/dist/assets/$1" },
+    { "src": "/admin/(.*)", "dest": "frontend/apps/admin/dist/index.html" },
+    { "src": "/assets/(.*)", "dest": "frontend/apps/reader/dist/assets/$1" },
+    { "src": "/(.*)", "dest": "frontend/apps/reader/dist/index.html" }
+  ]
+}

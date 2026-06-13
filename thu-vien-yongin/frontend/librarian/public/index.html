@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Thư viện Yongin — Thủ thư</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#222}
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1a1a2e,#0f3460);padding:20px}
+.login-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-box h2{font-size:1.2rem;margin-bottom:20px;text-align:center}
+.login-box input{width:100%;padding:12px 14px;border:1px solid #ddd;border-radius:8px;margin-bottom:12px;font-size:14px}
+.login-box .btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.login-box .btn-primary{background:#0f3460;color:#fff}
+.login-box .error{color:#e74c3c;font-size:.82rem;margin-bottom:8px;display:none}
+.app-screen{display:none}
+.header{background:#1a1a2e;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.header .logo{font-size:1rem;font-weight:700}.header .logo span{color:#e94560}
+.header .right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:.85rem}
+.header .right .avatar{width:32px;height:32px;border-radius:50%;background:#e94560;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff}
+.container{display:flex;min-height:calc(100vh-56px)}
+.sidebar{width:200px;background:#fff;border-right:1px solid #e0e0e0;padding:16px 0;flex-shrink:0;overflow-y:auto}
+.sidebar .menu{padding:0 10px}
+.sidebar .menu-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:.85rem;cursor:pointer;transition:all .2s;margin-bottom:2px}
+.sidebar .menu-item:hover{background:#f0f2f5}
+.sidebar .menu-item.active{background:#0f3460;color:#fff}
+.sidebar .menu-item .icon{font-size:1rem}
+.main{flex:1;padding:20px;overflow-x:hidden}
+.page{display:none}.page.active{display:block}
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:16px}
+.card h3{font-size:1rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.btn{padding:8px 18px;border:none;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:#0f3460;color:#fff}.btn-primary:hover{background:#1a1a2e}
+.btn-success{background:#27ae60;color:#fff}.btn-danger{background:#e74c3c;color:#fff}
+.btn-outline{background:transparent;border:1px solid #ddd;color:#555}
+.btn-sm{padding:5px 12px;font-size:.78rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+.stat-card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.stat-card .num{font-size:1.4rem;font-weight:700;color:#0f3460}
+.stat-card .label{font-size:.75rem;color:#888}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;padding:8px 10px;font-weight:600;border-bottom:2px solid #e0e0e0;font-size:.72rem;color:#666;text-transform:uppercase}
+td{padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:.8rem}
+tr:hover td{background:#fafbfc}
+.badge{padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600}
+.badge-green{background:#e8f5e9;color:#2e7d32}.badge-red{background:#fce4ec;color:#c62828}
+.badge-blue{background:#e3f2fd;color:#1565c0}.badge-yellow{background:#fff3cd;color:#856404}
+input,select,textarea{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:.85rem;width:100%}
+textarea{resize:vertical;min-height:50px;font-family:inherit}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.row>*{flex:1;min-width:130px}
+.row label{font-size:.8rem;color:#555;font-weight:500;margin-bottom:2px;display:block}
+.form-section{background:#f8f9fc;border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid #0f3460}
+.form-section h4{font-size:.9rem;margin-bottom:10px;color:#0f3460}
+.tag{display:inline-block;background:#e3f2fd;color:#0f3460;padding:2px 8px;border-radius:4px;font-size:.68rem;font-family:monospace;margin-left:4px}
+.toast{position:fixed;top:20px;right:20px;background:#27ae60;color:#fff;padding:14px 24px;border-radius:10px;font-size:.85rem;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);display:none}
+.toast.err{background:#e74c3c}
+.filter-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filter-bar select,.filter-bar input{max-width:200px}
+@media(max-width:768px){.sidebar{width:56px}.sidebar .menu-item span{display:none}.container{flex-direction:column}.sidebar{width:100%;border-right:none;padding:6px 0}.sidebar .menu{display:flex;gap:4px;overflow-x:auto;padding:0 8px}.sidebar .menu-item{white-space:nowrap;padding:6px 10px}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div class="login-screen" id="loginScreen">
+<div class="login-box">
+<h2>🔐 Đăng nhập Thủ thư</h2>
+<div class="error" id="loginError"></div>
+<input type="text" id="loginUser" placeholder="Tên đăng nhập" value="admin">
+<input type="password" id="loginPass" placeholder="Mật khẩu" value="admin123">
+<button class="btn btn-primary" onclick="doLogin()">Đăng nhập</button>
+<p style="font-size:.72rem;color:#999;margin-top:8px;text-align:center">👑 admin/admin123 · 🧑‍🏫 librarian/lib123</p>
+</div>
+</div>
+
+<div class="app-screen" id="appScreen">
+<div class="header"><div class="logo">🏛️ <span>Yongin</span> · Thủ thư</div><div class="right"><span id="staffName">Người dùng</span><div class="avatar">T</div></div></div>
+
+<div class="page" id="page-printing">
+<div class="card"><div class="hdr"><h3>🖨️ In nhãn ĐKCB (mã vạch)</h3></div>
+<div class="row"><div><label>ĐKCB từ</label><input id="barcodeFrom" placeholder="M.100001"></div><div><label>Đến</label><input id="barcodeTo" placeholder="M.100010"></div><button class="btn btn-primary btn-sm" onclick="generateBarcodes()" style="margin-top:18px">Tạo mã vạch</button></div>
+<div id="barcodeArea" style="margin-top:12px"></div>
+</div>
+
+<div class="card"><div class="hdr"><h3>🪪 In thẻ bạn đọc</h3></div>
+<div class="row"><input id="printPatronId" placeholder="Mã thẻ bạn đọc (VD: TV100001)"><button class="btn btn-primary btn-sm" onclick="printPatronCard()">Tạo thẻ</button></div>
+<div id="patronCardArea" style="margin-top:12px"></div>
+</div>
+
+<div class="card"><div class="hdr"><h3>📤 Xuất biểu ghi</h3></div>
+<div class="row">
+<select id="exportFormat"><option value="marc">MARC21 Text (.mrc)</option><option value="marcxml">MARC21 XML (.xml)</option><option value="dc">Dublin Core (.xml)</option></select>
+<input id="exportIds" placeholder="ID biểu ghi (cách phẩy, để trống = tất cả)">
+<button class="btn btn-primary btn-sm" onclick="exportRecords()" style="margin-top:18px">📥 Tải xuống</button>
+</div>
+</div>
+</div>
+
+</div></div></div>
+<div class="container">
+<div class="sidebar">
+<div class="menu">
+<div class="menu-item active" onclick="showPage('dashboard',this)"><span class="icon">📊</span><span>Dashboard</span></div>
+<div class="menu-item" onclick="showPage('addbook',this)"><span class="icon">📝</span><span>Nhập sách</span></div>
+<div class="menu-item" onclick="showPage('marcview',this)"><span class="icon">📋</span><span>MARC21</span></div>
+<div class="menu-item" onclick="showPage('acquisition',this)"><span class="icon">📥</span><span>Tiếp nhận</span></div>
+<div class="menu-item" onclick="showPage('inventory',this)"><span class="icon">📦</span><span>Tồn kho</span></div>
+<div class="menu-item" onclick="showPage('circulation',this)"><span class="icon">🔄</span><span>Mượn/Trả</span></div>
+<div class="menu-item" onclick="showPage('patrons',this)"><span class="icon">👤</span><span>Bạn đọc</span></div>
+<div class="menu-item" onclick="showPage('collection',this)"><span class="icon">🏪</span><span>Chuyển/Kiểm kê</span></div>
+<div class="menu-item" onclick="showPage('printing',this)"><span class="icon">🖨️</span><span>In ấn</span></div>
+</div>
+<div style="border-top:1px solid #e0e0e0;margin:10px;padding-top:8px">
+<div class="menu-item" onclick="logout()"><span class="icon">🚪</span><span>Đăng xuất</span></div>
+</div>
+</div>
+
+<div class="main">
+
+<div class="page active" id="page-dashboard">
+<div class="stats" id="dashStats">
+<div class="stat-card"><div class="num">—</div><div class="label">Đầu sách</div></div>
+<div class="stat-card"><div class="num">—</div><div class="label">Bạn đọc</div></div>
+<div class="stat-card"><div class="num">—</div><div class="label">Đang mượn</div></div>
+<div class="stat-card"><div class="num">—</div><div class="label">Quá hạn</div></div>
+</div>
+<div class="card"><h3>⏰ Sách quá hạn</h3><div id="overdueList"><p style="color:#888;font-size:.82rem">Đang tải...</p></div></div>
+</div>
+
+<div class="page" id="page-addbook">
+<div class="card"><div class="hdr"><h3>🔍 Kiểm tra trùng</h3></div>
+<div class="row"><div><label>Tên sách <span class="tag">245$a</span></label><input id="dupTitle" placeholder="Nhập tên sách"></div><div><label>Tác giả <span class="tag">100$a</span></label><input id="dupAuthor" placeholder="Tác giả"></div><div><label>Năm XB <span class="tag">260$c</span></label><input id="dupYear" placeholder="2026" style="max-width:100px"></div></div>
+<button class="btn btn-primary" onclick="checkDuplicate()">🔍 Kiểm tra trùng</button><div id="dupResult" style="margin-top:8px"></div></div>
+
+<div class="card"><div class="hdr"><h3>📡 Tra cứu TVQG</h3></div>
+<div class="row"><input id="tvqgSearch" placeholder="Tìm kiếm trên Thư viện Quốc gia..." style="flex:2"><button class="btn btn-primary btn-sm" onclick="searchTvqg()">Tìm</button></div>
+<div id="tvqgResult" style="margin-top:8px"></div></div>
+
+<div class="card"><div class="hdr"><h3>📖 Nhập thông tin sách</h3></div>
+<div class="form-section"><h4>📕 Thông tin cơ bản</h4>
+<div class="row">
+<div><label>Tên sách * <span class="tag">245$a</span></label><input id="fTitle" placeholder="VD: Văn hóa Việt Nam"></div>
+<div><label>Tác giả * <span class="tag">100$a</span></label><div style="display:flex;gap:4px"><input id="fAuthor" placeholder="VD: Trần Quốc Vượng" style="flex:1"><button class="btn btn-outline btn-sm" onclick="generateCutter()" title="Sinh mã Cutter">✂️</button></div></div>
+</div>
+<div class="row">
+<div><label>Nhà xuất bản <span class="tag">260$b</span></label><input id="fPublisher" placeholder="VD: NXB Văn hóa"></div>
+<div><label>Nơi XB <span class="tag">260$a</span></label><input id="fPlace" placeholder="VD: Hà Nội"></div>
+<div><label>Năm XB <span class="tag">260$c</span></label><input id="fYear" placeholder="2026"></div>
+</div>
+<div class="row">
+<div><label>ISBN <span class="tag">020$a</span></label><input id="fIsbn" placeholder="VD: 9786047767298"></div>
+<div><label>Lần XB <span class="tag">250$a</span></label><input id="fEdition" placeholder="VD: Tái bản lần 5"></div>
+</div>
+</div>
+<div class="form-section"><h4>📏 Mô tả vật lý</h4>
+<div class="row">
+<div><label>Số trang <span class="tag">300$a</span></label><input id="fPages" placeholder="VD: 456 tr."></div>
+<div><label>Khổ sách <span class="tag">300$c</span></label><input id="fSize" placeholder="VD: 24 cm"></div>
+<div><label>Ngôn ngữ <span class="tag">041$a</span></label><select id="fLang"><option value="vie">Tiếng Việt</option><option value="eng">English</option><option value="fre">Français</option><option value="chi">中文</option></select></div>
+</div>
+<div class="row">
+<div><label>Tùng thư <span class="tag">490$a</span></label><input id="fSeries" placeholder="VD: Tủ sách Văn hóa"></div>
+<div><label>Nhan đề song song <span class="tag">246$a</span></label><input id="fAltTitle" placeholder="VD: English title"></div>
+</div>
+</div>
+<div class="form-section"><h4>🏷️ Phân loại & Từ khóa</h4>
+<div class="row">
+<div><label>Mã DDC <span class="tag">082$a</span></label><input id="fDdc" placeholder="VD: 332.6324"></div>
+<div><label>Mã Cutter <span class="tag">082$b</span></label><input id="fCutter" placeholder="Tự động sau khi sinh" readonly style="background:#f0f2f5"></div>
+</div>
+<div><label>Chủ đề <span class="tag">650$a</span></label><input id="fSubject" placeholder="VD: Văn hóa, Lịch sử (cách nhau phẩy)"></div>
+<div style="margin-top:8px"><label>Tóm tắt <span class="tag">520$a</span></label><textarea id="fSummary" placeholder="Mô tả ngắn nội dung sách..."></textarea></div>
+</div>
+<div class="form-section"><h4>📍 Vị trí lưu trữ</h4>
+<div class="row">
+<div><label>Số ĐKCB * <span class="tag">852$j</span></label><input id="fDkcb" placeholder="VD: M.100051"></div>
+<div><label>Kho <span class="tag">852$b</span></label><select id="fShelf"><option value="Kho Mượn">Kho Mượn</option><option value="Kho Đọc">Kho Đọc</option><option value="Kho Thiếu nhi">Kho Thiếu nhi</option><option value="Kho Người lớn">Kho Người lớn</option></select></div>
+</div>
+</div>
+<div style="display:flex;gap:8px;margin-top:4px"><button class="btn btn-success" onclick="addSimpleBook()" style="flex:1">💾 Lưu sách</button></div>
+<div id="addResult" style="margin-top:8px"></div>
+</div>
+</div>
+
+<div class="page" id="page-marcview">
+<div class="card"><div class="hdr"><h3>📋 Xem biểu ghi MARC21</h3></div>
+<div class="row"><input id="marcSearch" placeholder="Nhập ID biểu ghi hoặc tên sách..." style="flex:2"><button class="btn btn-primary btn-sm" onclick="searchMarc()">Tìm</button></div>
+<div id="marcViewer" style="margin-top:8px;font-family:monospace;font-size:.78rem;line-height:1.5;background:#f8f9fc;padding:12px;border-radius:8px;max-height:500px;overflow:auto;white-space:pre-wrap">Nhập ID biểu ghi để xem chi tiết MARC21</div>
+</div></div>
+
+<div class="page" id="page-acquisition">
+<div class="card"><div class="hdr"><h3>📥 Tạo phiếu tiếp nhận</h3></div>
+<div class="row"><div><label>Nhà cung cấp</label><input id="acqVendor" placeholder="VD: NXB Văn hóa"></div><div><label>Ngày nhận</label><input type="date" id="acqDate"></div></div>
+<div><label>Danh sách sách (mỗi dòng 1 cuốn: Tên sách, Tác giả, NXB, SL)</label><textarea id="acqItems" rows="5" placeholder="Văn hóa Việt Nam, Trần Quốc Vượng, NXB Văn hóa, 2&#10;Cơ sở văn hóa, Trần Ngọc Thêm, NXB Giáo dục, 1"></textarea></div>
+<div style="margin-top:8px"><input id="acqNotes" placeholder="Ghi chú (nếu có)"></div>
+<button class="btn btn-primary" onclick="createAcquisition()" style="margin-top:8px">📥 Tạo phiếu tiếp nhận</button>
+<div id="acqResult" style="margin-top:8px"></div>
+</div>
+<div class="card"><div class="hdr"><h3>📋 Danh sách phiếu</h3></div>
+<div id="acqList"><p style="color:#888;font-size:.85rem">Đang tải...</p></div></div>
+</div>
+
+<div class="page" id="page-inventory">
+<div class="card"><div class="hdr"><h3>📦 Tồn kho thư viện</h3></div>
+<div class="filter-bar">
+<select id="invShelf" onchange="loadInventory()"><option value="">📁 Tất cả kho</option><option value="Kho Mượn">Kho Mượn</option><option value="Kho Đọc">Kho Đọc</option><option value="Kho Thiếu nhi">Kho Thiếu nhi</option><option value="Kho Người lớn">Kho Người lớn</option></select>
+<select id="invStatus" onchange="loadInventory()"><option value="">📋 Tất cả</option><option value="available">✅ Còn</option><option value="checked_out">📤 Đã mượn</option><option value="discarded">🗑️ Thanh lý</option></select>
+<input id="invSearch" placeholder="🔍 Tìm ĐKCB hoặc tên sách..." onkeyup="if(event.key==='Enter')loadInventory()">
+<button class="btn btn-primary btn-sm" onclick="loadInventory()">Tìm</button>
+</div>
+<div id="inventoryList"><p style="color:#888;font-size:.85rem">Đang tải...</p></div>
+</div></div>
+
+<div class="page" id="page-circulation">
+<div class="card"><h3>📤 Mượn sách</h3><div class="row"><input id="coPatron" placeholder="Mã thẻ bạn đọc (VD: TV100001)"><input id="coItems" placeholder="ĐKCB (cách nhau phẩy)"><button class="btn btn-success btn-sm" onclick="checkout()">Mượn</button></div><div id="coResult"></div></div>
+<div class="card"><h3>📥 Trả sách</h3><div class="row"><input id="ciItems" placeholder="ĐKCB"><button class="btn btn-primary btn-sm" onclick="checkin()">Trả</button></div><div id="ciResult"></div></div>
+</div>
+
+<div class="page" id="page-patrons">
+<div class="card"><h3>🔍 Tìm bạn đọc</h3><div class="row"><input id="patronQ" placeholder="Tên, mã thẻ, email..."><button class="btn btn-primary btn-sm" onclick="searchPatrons()">Tìm</button></div><div id="patronResult"></div></div>
+</div>
+
+<div class="page" id="page-collection">
+<div class="card"><h3>🏪 Chuyển kho / Thanh lý</h3>
+<div class="row"><div><label>ĐKCB</label><input id="trItems" placeholder="ĐKCB (phẩy cách)"></div><div><label>Kho đến</label><select id="trShelf"><option value="Kho Mượn">Kho Mượn</option><option value="Kho Đọc">Kho Đọc</option><option value="Kho Thiếu nhi">Kho Thiếu nhi</option><option value="Kho Người lớn">Kho Người lớn</option></select></div><button class="btn btn-primary btn-sm" onclick="transfer()" style="margin-top:18px">Chuyển</button></div>
+<div class="row" style="margin-top:8px"><div><label>ĐKCB thanh lý</label><input id="dcItems" placeholder="ĐKCB"></div><div><label>Lý do</label><input id="dcReason" placeholder="Hư hỏng, mất..."></div><button class="btn btn-danger btn-sm" onclick="discard()" style="margin-top:18px">Thanh lý</button></div></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+var TOKEN = '';
+var ALL_ITEMS = [];
+
+function toast(msg, isErr) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isErr ? ' err' : '');
+    t.style.display = 'block';
+    setTimeout(function() { t.style.display = 'none'; }, 3000);
+}
+
+function auth() {
+    return {
+        headers: {
+            'Authorization': 'Bearer ' + TOKEN,
+            'Content-Type': 'application/json'
+        }
+    };
+}
+
+function doLogin() {
+    var u = document.getElementById('loginUser').value;
+    var p = document.getElementById('loginPass').value;
+    var err = document.getElementById('loginError');
+    err.style.display = 'none';
+    
+    fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.accessToken) {
+            TOKEN = d.accessToken;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'block';
+            document.getElementById('staffName').textContent = d.user.fullName;
+            document.querySelector('.avatar').textContent = d.user.fullName.charAt(0).toUpperCase();
+            loadDashboard();
+        } else {
+            err.textContent = d.message || 'Sai tài khoản';
+            err.style.display = 'block';
+        }
+    })
+    .catch(function(e) {
+        err.textContent = 'Lỗi: ' + e.message;
+        err.style.display = 'block';
+    });
+}
+
+function logout() {
+    if (!confirm('Đăng xuất?')) return;
+    TOKEN = '';
+    document.getElementById('appScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+}
+
+function showPage(name, btn) {
+    var pages = document.querySelectorAll('.page');
+    for (var i = 0; i < pages.length; i++) { pages[i].classList.remove('active'); }
+    document.getElementById('page-' + name).classList.add('active');
+    
+    var items = document.querySelectorAll('.sidebar .menu-item');
+    for (var i = 0; i < items.length; i++) { items[i].classList.remove('active'); }
+    if (btn) btn.classList.add('active');
+    
+    if (name === 'inventory') loadInventory();
+    if (name === 'acquisition') loadAcquisitions();
+}
+
+function searchTvqg() {
+    var q = document.getElementById('tvqgSearch').value;
+    if (!q) return;
+    fetch('/api/cataloging/tvqg/search?q=' + encodeURIComponent(q))
+    .then(function(r) { return r.json(); })
+    .then(function(records) {
+        if (records && records.length > 0) {
+            var html = '<table><tr><th>Nhan đề</th><th>Tác giả</th><th>NXB</th><th>Năm</th><th></th></tr>';
+            for (var i = 0; i < records.length; i++) {
+                html += '<tr><td>' + records[i].title + '</td><td>' + (records[i].author || '') + '</td><td>' + (records[i].publisher || '') + '</td><td>' + (records[i].year || '') + '</td>';
+                html += '<td><button class="btn btn-sm btn-primary" onclick="importFromTvqg(\'' + records[i].id + '\')">📥 Tải</button></td></tr>';
+            }
+            html += '</table>';
+            document.getElementById('tvqgResult').innerHTML = html;
+        } else {
+            document.getElementById('tvqgResult').innerHTML = '<p style="color:#888;font-size:.85rem">Không tìm thấy trên TVQG</p>';
+        }
+    });
+}
+
+function importFromTvqg(id) {
+    fetch('/api/cataloging/tvqg/import/' + id, {
+        method: 'POST',
+        headers: auth().headers
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { toast(d.message || 'Đã tải về thành công!'); });
+}
+
+function searchMarc() {
+    var q = document.getElementById('marcSearch').value;
+    if (!q) return;
+    // Nếu là số → tìm theo ID
+    if (/^\d+$/.test(q)) {
+        loadMarcRecord(parseInt(q));
+    } else {
+        // Tìm theo tên
+        fetch('/api/cataloging/records/search?q=' + encodeURIComponent(q), auth())
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.results && d.results.length > 0) {
+                loadMarcRecord(d.results[0].marc_record_id);
+            } else {
+                document.getElementById('marcViewer').textContent = '😕 Không tìm thấy biểu ghi';
+            }
+        });
+    }
+}
+
+function loadMarcRecord(id) {
+    fetch('/api/cataloging/records/' + id, auth())
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (!d.record) { document.getElementById('marcViewer').textContent = '😕 Không tìm thấy'; return; }
+        var html = '📋 Biểu ghi MARC21 #' + d.record.id + '\n';
+        html += '━'.repeat(50) + '\n';
+        html += 'Leader: ' + d.record.leader + '\n\n';
+        if (d.fields) {
+            for (var i = 0; i < d.fields.length; i++) {
+                var f = d.fields[i];
+                html += f.tag + '  ' + (f.ind1 || '#') + (f.ind2 || '#') + '  ';
+                if (f.marc_subfields) {
+                    for (var j = 0; j < f.marc_subfields.length; j++) {
+                        var sf = f.marc_subfields[j];
+                        html += '$' + sf.code + sf.value + ' ';
+                    }
+                }
+                html += '\n';
+            }
+        }
+        if (d.bibItem) {
+            html += '\n📖 ' + d.bibItem.title + ' — ' + (d.bibItem.author_main || '');
+        }
+        document.getElementById('marcViewer').textContent = html;
+    });
+}
+
+function loadAcquisitions() {
+    fetch('/api/acquisition/receipts', auth())
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.results && d.results.length > 0) {
+            var html = '<table><tr><th>Mã phiếu</th><th>Nhà CC</th><th>Ngày</th><th>Trạng thái</th><th>Người tạo</th></tr>';
+            for (var i = 0; i < d.results.length; i++) {
+                var badge = d.results[i].status === 'completed' ? 'badge-green' : (d.results[i].status === 'processing' ? 'badge-yellow' : 'badge-blue');
+                html += '<tr><td><strong>' + d.results[i].receipt_code + '</strong></td><td>' + (d.results[i].vendor || '') + '</td><td>' + d.results[i].received_date + '</td><td><span class="badge ' + badge + '">' + d.results[i].status + '</span></td><td>' + (d.results[i].created_by_name || '') + '</td></tr>';
+            }
+            html += '</table>';
+            document.getElementById('acqList').innerHTML = html;
+        } else {
+            document.getElementById('acqList').innerHTML = '<p style="color:#888;font-size:.85rem">Chưa có phiếu nào</p>';
+        }
+    });
+}
+
+function createAcquisition() {
+    var vendor = document.getElementById('acqVendor').value;
+    var date = document.getElementById('acqDate').value || new Date().toISOString().split('T')[0];
+    var itemsText = document.getElementById('acqItems').value;
+    var notes = document.getElementById('acqNotes').value;
+    
+    if (!itemsText.trim()) { toast('Nhập danh sách sách', true); return; }
+    
+    var items = itemsText.split('\n').filter(function(l) { return l.trim(); }).map(function(line) {
+        var parts = line.split(',').map(function(s) { return s.trim(); });
+        return { title: parts[0] || '', author: parts[1] || '', publisher: parts[2] || '', quantity: parseInt(parts[3]) || 1 };
+    }).filter(function(i) { return i.title; });
+    
+    fetch('/api/acquisition/receipts', {
+        method: 'POST',
+        headers: auth().headers,
+        body: JSON.stringify({ vendor: vendor, receivedDate: date, items: items, notes: notes || null })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.receipt_code) {
+            toast('Đã tạo phiếu: ' + d.receipt_code);
+            document.getElementById('acqVendor').value = '';
+            document.getElementById('acqItems').value = '';
+            document.getElementById('acqNotes').value = '';
+            loadAcquisitions();
+        } else {
+            toast(d.message || 'Lỗi', true);
+        }
+    });
+}
+
+function loadDashboard() {
+    fetch('/api/admin/dashboard', auth())
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        document.getElementById('dashStats').innerHTML = 
+            '<div class="stat-card"><div class="num">' + (d.total_titles||0) + '</div><div class="label">Đầu sách</div></div>' +
+            '<div class="stat-card"><div class="num">' + (d.total_patrons||0) + '</div><div class="label">Bạn đọc</div></div>' +
+            '<div class="stat-card"><div class="num">' + (d.active_checkouts||0) + '</div><div class="label">Đang mượn</div></div>' +
+            '<div class="stat-card"><div class="num">' + (d.overdue_count||0) + '</div><div class="label">Quá hạn</div></div>';
+    });
+    
+    fetch('/api/circulation/overdue', auth())
+    .then(function(r) { return r.json(); })
+    .then(function(od) {
+        if (od.length > 0) {
+            var html = '<table><tr><th>Bạn đọc</th><th>Sách</th><th>Hạn trả</th></tr>';
+            for (var i = 0; i < Math.min(od.length, 5); i++) {
+                html += '<tr><td>' + od[i].patron_name + '</td><td>' + od[i].title + '</td><td><span class="badge badge-red">' + od[i].due_date + '</span></td></tr>';
+            }
+            html += '</table>';
+            document.getElementById('overdueList').innerHTML = html;
+        } else {
+            document.getElementById('overdueList').innerHTML = '<p style="color:#888;font-size:.82rem">✅ Không có sách quá hạn</p>';
+        }
+    });
+}
+
+function checkDuplicate() {
+    var t = document.getElementById('dupTitle').value;
+    if (!t) return;
+    fetch('/api/cataloging/search-duplicate', {
+        method: 'POST',
+        headers: auth().headers,
+        body: JSON.stringify({
+            title: t,
+            author: document.getElementById('dupAuthor').value,
+            year: document.getElementById('dupYear').value ? parseInt(document.getElementById('dupYear').value) : null
+        })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.duplicate) {
+            document.getElementById('dupResult').innerHTML = '<div style="color:#856404;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px">⚠️ Tìm thấy ' + d.matches.length + ' biểu ghi trùng</div>';
+        } else {
+            document.getElementById('dupResult').innerHTML = '<div style="color:#27ae60;padding:6px">✅ Không trùng — có thể nhập mới</div>';
+        }
+    });
+}
+
+function generateCutter() {
+    var title = document.getElementById('fTitle').value;
+    if (!title) { toast('Nhập tên sách trước', true); return; }
+    fetch('/api/cataloging/generate-cutter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.cutter) {
+            document.getElementById('fCutter').value = d.cutter;
+            toast('Mã Cutter: ' + d.cutter);
+        }
+    });
+}
+
+function addSimpleBook() {
+    var title = document.getElementById('fTitle').value;
+    var author = document.getElementById('fAuthor').value;
+    var dkcb = document.getElementById('fDkcb').value;
+    if (!title || !author || !dkcb) { toast('Nhập Tên sách, Tác giả và Số ĐKCB', true); return; }
+    
+    var fields = {};
+    var isbn = document.getElementById('fIsbn').value;
+    if (isbn) fields['020'] = { ind1: '#', ind2: '#', subfields: { a: isbn } };
+    
+    fields['041'] = { ind1: '0', ind2: '#', subfields: { a: document.getElementById('fLang').value || 'vie' } };
+    
+    var ddc = document.getElementById('fDdc').value;
+    var cutter = document.getElementById('fCutter').value;
+    if (ddc || cutter) {
+        var s = {};
+        if (ddc) s.a = ddc;
+        if (cutter) s.b = cutter;
+        fields['082'] = { ind1: '0', ind2: '4', subfields: Object.assign(s, { '2': '23' }) };
+    }
+    
+    fields['100'] = { ind1: '1', ind2: '#', subfields: { a: author } };
+    fields['245'] = { ind1: '1', ind2: '0', subfields: { a: title, c: author } };
+    
+    var pub = document.getElementById('fPublisher').value;
+    var place = document.getElementById('fPlace').value;
+    var year = document.getElementById('fYear').value;
+    var edition = document.getElementById('fEdition').value;
+    
+    if (pub || place || year) {
+        var s = {};
+        if (place) s.a = place;
+        if (pub) s.b = pub;
+        if (year) s.c = year;
+        fields['260'] = { ind1: '#', ind2: '#', subfields: s };
+    }
+    if (edition) fields['250'] = { ind1: '#', ind2: '#', subfields: { a: edition } };
+    
+    var pages = document.getElementById('fPages').value;
+    var size = document.getElementById('fSize').value;
+    if (pages || size) {
+        var s = {};
+        if (pages) s.a = pages;
+        if (size) s.c = size;
+        fields['300'] = { ind1: '#', ind2: '#', subfields: s };
+    }
+    
+    var series = document.getElementById('fSeries').value;
+    if (series) fields['490'] = { ind1: '0', ind2: '#', subfields: { a: series } };
+    
+    var altTitle = document.getElementById('fAltTitle').value;
+    if (altTitle) fields['246'] = { ind1: '1', ind2: '1', subfields: { a: altTitle } };
+    
+    var summary = document.getElementById('fSummary').value;
+    if (summary) fields['520'] = { ind1: '#', ind2: '#', subfields: { a: summary } };
+    
+    var subjects = document.getElementById('fSubject').value;
+    if (subjects) {
+        var arr = subjects.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+        fields['650'] = arr.map(function(s) { return { ind1: '#', ind2: '7', subfields: { a: s, '2': 'TVQG' } }; });
+    }
+    
+    var shelf = document.getElementById('fShelf').value || 'Kho Mượn';
+    fields['852'] = { ind1: '#', ind2: '#', subfields: { a: 'Thư viện Đà Nẵng', b: shelf, j: dkcb } };
+    
+    fetch('/api/cataloging/records', {
+        method: 'POST',
+        headers: auth().headers,
+        body: JSON.stringify({ fields: fields })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.record && d.record.id) {
+            toast('Đã nhập sách "' + title + '" thành công!');
+            var ids = ['fTitle','fAuthor','fPublisher','fPlace','fYear','fEdition','fIsbn','fPages','fSize','fSeries','fAltTitle','fSubject','fSummary','fDkcb','fDdc','fCutter'];
+            for (var i = 0; i < ids.length; i++) {
+                var el = document.getElementById(ids[i]);
+                if (el) el.value = '';
+            }
+        } else {
+            toast(d.message || 'Lỗi nhập sách', true);
+        }
+    })
+    .catch(function(e) { toast('Lỗi: ' + e.message, true); });
+}
+
+function loadInventory() {
+    var shelf = document.getElementById('invShelf').value;
+    var status = document.getElementById('invStatus').value;
+    var q = document.getElementById('invSearch').value;
+    
+    var url = '/api/collection/items?page=1&limit=500';
+    if (shelf) url += '&shelf=' + encodeURIComponent(shelf);
+    if (status) url += '&status=' + status;
+    
+    fetch(url, auth())
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        ALL_ITEMS = d.results || [];
+        var items = ALL_ITEMS;
+        if (q) {
+            var sq = q.toLowerCase();
+            items = items.filter(function(i) {
+                return (i.dkcb && i.dkcb.toLowerCase().indexOf(sq) >= 0) || 
+                       (i.title && i.title.toLowerCase().indexOf(sq) >= 0);
+            });
+        }
+        if (items.length > 0) {
+            var html = '<table><tr><th>ĐKCB</th><th>Nhan đề</th><th>Tác giả</th><th>Kho</th><th>Tình trạng</th><th>🔴 Đóng dấu</th><th>✍️ Ngày ĐKCB</th></tr>';
+            for (var i = 0; i < items.length; i++) {
+                var badgeClass = items[i].status === 'available' ? 'badge-green' : (items[i].status === 'checked_out' ? 'badge-yellow' : 'badge-red');
+                var statusText = items[i].status === 'available' ? '✅ Còn' : (items[i].status === 'checked_out' ? '📤 Đã mượn' : items[i].status);
+                html += '<tr><td><strong>' + items[i].dkcb + '</strong></td><td>' + (items[i].title || '') + '</td><td style="font-size:.75rem">' + (items[i].author_main || '') + '</td><td>' + (items[i].shelf_section || '') + '</td><td><span class="badge ' + badgeClass + '">' + statusText + '</span></td>' +
+                '<td style="text-align:center"><input type="checkbox" ' + (items[i].stamp_done ? 'checked' : '') + ' onchange="toggleStamp(' + items[i].id + ', this.checked)"></td>' +
+                '<td style="font-size:.75rem">' + (items[i].dkcb_date || '-') + '</td></tr>';
+            }
+            html += '</table><p style="color:#888;font-size:.75rem;margin-top:6px">📦 ' + items.length + ' tài liệu</p>';
+            document.getElementById('inventoryList').innerHTML = html;
+        } else {
+            document.getElementById('inventoryList').innerHTML = '<p style="color:#888;font-size:.85rem;padding:12px">📭 Không có tài liệu</p>';
+        }
+    })
+    .catch(function(e) { document.getElementById('inventoryList').innerHTML = '<div style="color:#e74c3c">❌ Lỗi: ' + e.message + '</div>'; });
+}
+
+function toggleStamp(itemId, checked) {
+    var updates = { stamp_done: checked };
+    if (checked) updates.dkcb_date = new Date().toISOString().split('T')[0];
+    fetch('/api/collection/items/' + itemId + '/stamp', {
+        method: 'PUT',
+        headers: auth().headers,
+        body: JSON.stringify(updates)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { if (d.message) toast(d.message); });
+}
+
+function checkout() {
+    var p = document.getElementById('coPatron').value;
+    var items = document.getElementById('coItems').value.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+    if (!p || !items.length) return;
+    fetch('/api/circulation/checkout', {
+        method: 'POST',
+        headers: auth().headers,
+        body: JSON.stringify({ patronBarcode: p, itemBarcodes: items })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        document.getElementById('coResult').innerHTML = '<div style="padding:6px;color:#27ae60">✅ ' + (d.message || 'Mượn thành công') + '</div>';
+    })
+    .catch(function(e) {
+        document.getElementById('coResult').innerHTML = '<div style="padding:6px;color:#e74c3c">❌ ' + e.message + '</div>';
+    });
+}
+
+function checkin() {
+    var items = document.getElementById('ciItems').value.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+    if (!items.length) return;
+    fetch('/api/circulation/checkin', {
+        method: 'POST',
+        headers: auth().headers,
+        body: JSON.stringify({ itemBarcodes: items })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        document.getElementById('ciResult').innerHTML = '<div style="padding:6px;color:#27ae60">✅ ' + (d.message || 'Trả thành công') + '</div>';
+    })
+    .catch(function(e) {
+        document.getElementById('ciResult').innerHTML = '<div style="padding:6px;color:#e74c3c">❌ ' + e.message + '</div>';
+    });
+}
+
+function searchPatrons() {
+    var q = document.getElementById('patronQ').value;
+    if (!q) return;
+    fetch('/api/patron/search?q=' + encodeURIComponent(q), {
+        headers: { 'Authorization': 'Bearer ' + TOKEN }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.results && d.results.length > 0) {
+            var html = '<table><tr><th>Mã thẻ</th><th>Họ tên</th><th>Email</th><th>ĐT</th><th>Loại</th></tr>';
+            for (var i = 0; i < d.results.length; i++) {
+                html += '<tr><td>' + d.results[i].card_barcode + '</td><td>' + d.results[i].full_name + '</td><td style="font-size:.78rem">' + (d.results[i].email || '') + '</td><td>' + (d.results[i].phone || '') + '</td><td><span class="badge badge-blue">' + d.results[i].patron_type + '</span></td></tr>';
+            }
+            html += '</table>';
+            document.getElementById('patronResult').innerHTML = html;
+        } else {
+            document.getElementById('patronResult').innerHTML = '<p style="color:#888;padding:8px">😕 Không tìm thấy</p>';
+        }
+    });
+}
+
+function transfer() {
+    var items = document.getElementById('trItems').value.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+    var to = document.getElementById('trShelf').value;
+    if (!items.length || !to) return;
+    fetch('/api/collection/transfer', {
+        method: 'POST',
+        headers: auth().headers,
+        body: JSON.stringify({ itemIds: items, toShelf: to })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { toast(d.message || 'Đã chuyển'); });
+}
+
+function discard() {
+    var items = document.getElementById('dcItems').value.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+    var reason = document.getElementById('dcReason').value;
+    if (!items.length) return;
+    fetch('/api/collection/discard', {
+        method: 'POST',
+        headers: auth().headers,
+        body: JSON.stringify({ itemIds: items, reason: reason })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { toast(d.message || 'Đã thanh lý'); });
+}
+
+// ─── IN ẤN ───
+function generateBarcodes() {
+    var from = document.getElementById('barcodeFrom').value;
+    var to = document.getElementById('barcodeTo').value;
+    if (!from) { toast('Nhập ĐKCB bắt đầu', true); return; }
+    
+    fetch('/api/collection/items?page=1&limit=500', auth())
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        var items = d.results || [];
+        if (to) {
+            items = items.filter(function(i) { return i.dkcb >= from && i.dkcb <= to; });
+        } else {
+            items = items.filter(function(i) { return i.dkcb === from || (i.dkcb >= from); });
+        }
+        items = items.slice(0, 50);
+        
+        if (items.length === 0) { toast('Không tìm thấy', true); return; }
+        
+        var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+        for (var i = 0; i < items.length; i++) {
+            html += '<div style="border:1px solid #ddd;border-radius:4px;padding:8px;text-align:center;page-break-inside:avoid">';
+            html += '<div style="font-size:.6rem;color:#888">' + items[i].dkcb + '</div>';
+            html += '<div style="font-size:1.6rem;font-family:monospace;margin:4px 0">||||||||||</div>';
+            html += '<div style="font-size:.55rem">' + (items[i].title ? items[i].title.substring(0, 30) : '') + '</div>';
+            html += '</div>';
+        }
+        html += '</div><div style="margin-top:8px"><button class="btn btn-primary" onclick="window.print()">🖨️ In nhãn</button></div>';
+        document.getElementById('barcodeArea').innerHTML = html;
+    });
+}
+
+function printPatronCard() {
+    var cardBarcode = document.getElementById('printPatronId').value;
+    if (!cardBarcode) { toast('Nhập mã thẻ', true); return; }
+    
+    fetch('/api/patron/search?q=' + encodeURIComponent(cardBarcode), {
+        headers: { 'Authorization': 'Bearer ' + TOKEN }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        var patron = d.results && d.results[0];
+        if (!patron) { toast('Không tìm thấy', true); return; }
+        
+        var html = '<div id="patronCard" style="width:85.6mm;height:54mm;border:1px solid #333;border-radius:4px;padding:6px 8px;font-size:.7rem;position:relative;background:#fff;margin:0 auto">';
+        html += '<div style="font-weight:700;font-size:.75rem;text-align:center;border-bottom:1px solid #333;padding-bottom:2px">THƯ VIỆN YONGIN</div>';
+        html += '<div style="display:flex;gap:6px;margin-top:4px">';
+        html += '<div style="flex:1"><div><strong>' + patron.full_name + '</strong></div>';
+        html += '<div style="font-size:.55rem;color:#666">Mã thẻ: ' + patron.card_barcode + '</div>';
+        html += '<div style="font-size:.55rem;color:#666">Loại: ' + (patron.patron_type === 'child' ? 'Thiếu nhi' : 'Người lớn') + '</div></div>';
+        html += '<div style="width:50px;display:flex;align-items:center;justify-content:center;font-size:.7rem">|||||||</div>';
+        html += '</div></div>';
+        html += '<div style="margin-top:8px"><button class="btn btn-primary" onclick="window.print()">🖨️ In thẻ</button></div>';
+        document.getElementById('patronCardArea').innerHTML = html;
+    });
+}
+
+function exportRecords() {
+    var format = document.getElementById('exportFormat').value;
+    var ids = document.getElementById('exportIds').value;
+    var url = '/api/cataloging/export?format=' + format;
+    if (ids) url += '&ids=' + ids;
+    
+    window.open(url, '_blank');
+    toast('Đang tải file xuống...');
+}
+</script>
+</body>
+</html>

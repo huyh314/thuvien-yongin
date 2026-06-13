@@ -1,0 +1,16 @@
+{
+  "name": "thu-vien-yongin-frontend",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:reader": "npm run dev -w apps/reader",
+    "dev:librarian": "npm run dev -w apps/librarian",
+    "dev:admin": "npm run dev -w apps/admin",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint apps packages --ext .ts,.tsx"
+  }
+}

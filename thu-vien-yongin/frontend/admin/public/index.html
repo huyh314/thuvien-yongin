@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Thư viện Yongin — Quản trị</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#222}
+        .login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1a1a2e,#0f3460);padding:20px}
+        .login-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+        .login-box h2{font-size:1.2rem;margin-bottom:20px;text-align:center}
+        .login-box input{width:100%;padding:12px 14px;border:1px solid #ddd;border-radius:8px;margin-bottom:12px;font-size:14px}
+        .login-box .btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+        .login-box .btn-primary{background:#0f3460;color:#fff}
+        .login-box .error{color:#e74c3c;font-size:.82rem;margin-bottom:8px;display:none}
+        .app-screen{display:none}
+        .header{background:#1a1a2e;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+        .header .logo{font-size:1rem;font-weight:700}.header .logo span{color:#e94560}
+        .header .right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:.85rem}
+        .header .right .avatar{width:32px;height:32px;border-radius:50%;background:#e94560;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff}
+        .container{display:flex;min-height:calc(100vh-56px)}
+        .sidebar{width:230px;background:#fff;border-right:1px solid #e0e0e0;padding:16px 0;flex-shrink:0}
+        .sidebar .menu{padding:0 12px}
+        .sidebar .menu-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:.9rem;cursor:pointer;transition:all .2s;margin-bottom:2px}
+        .sidebar .menu-item:hover{background:#f0f2f5}
+        .sidebar .menu-item.active{background:#0f3460;color:#fff}
+        .sidebar .menu-item .icon{font-size:1.1rem}
+        .sidebar .divider{height:1px;background:#e0e0e0;margin:12px 14px}
+        .sidebar .menu-label{font-size:.7rem;color:#aaa;text-transform:uppercase;letter-spacing:.5px;padding:8px 14px 4px}
+        .main{flex:1;padding:20px;overflow-x:hidden}
+        .page{display:none}.page.active{display:block}
+        .section-title{font-size:1.1rem;font-weight:700;margin-bottom:16px}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+        .stat-card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.04);border-left:4px solid #0f3460}
+        .stat-card .num{font-size:1.8rem;font-weight:700;color:#0f3460}
+        .stat-card .label{font-size:.78rem;color:#888;margin-top:2px}
+        .stat-card.overdue{border-left-color:#e74c3c}.stat-card.overdue .num{color:#e74c3c}
+        .stat-card.warn{border-left-color:#f39c12}.stat-card.warn .num{color:#f39c12}
+        .card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:16px}
+        .card h3{font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .card .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+        .btn{padding:8px 18px;border:none;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+        .btn-primary{background:#0f3460;color:#fff}.btn-primary:hover{background:#1a1a2e}
+        .btn-success{background:#27ae60;color:#fff}
+        .btn-danger{background:#e74c3c;color:#fff}
+        .btn-outline{background:transparent;border:1px solid #ddd;color:#555}
+        .btn-sm{padding:5px 12px;font-size:.78rem}
+        table{width:100%;border-collapse:collapse;font-size:.85rem}
+        th{text-align:left;padding:10px 12px;font-weight:600;border-bottom:2px solid #e0e0e0;font-size:.75rem;color:#666;text-transform:uppercase;letter-spacing:.3px}
+        td{padding:10px 12px;border-bottom:1px solid #f0f0f0;font-size:.82rem}
+        tr:hover td{background:#fafbfc}
+        .badge{padding:3px 10px;border-radius:12px;font-size:.72rem;font-weight:600;display:inline-block}
+        .badge-green{background:#e8f5e9;color:#2e7d32}.badge-red{background:#fce4ec;color:#c62828}
+        .badge-blue{background:#e3f2fd;color:#1565c0}.badge-yellow{background:#fff3cd;color:#856404}
+        .badge-purple{background:#f3e5f5;color:#6a1b9a}
+        select,input{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:.85rem;width:100%}
+        input[type=text],input[type=password]{width:100%}
+        .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+        .row>*{flex:1;min-width:120px}
+        .tab-bar{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+        .tab-bar button{padding:8px 18px;border:1px solid #ddd;background:#fff;border-radius:8px;font-size:.82rem;cursor:pointer;transition:all .2s}
+        .tab-bar button.active{background:#0f3460;color:#fff;border-color:#0f3460}
+        .tab-bar button:hover:not(.active){background:#f0f2f5}
+        pre{background:#f8f9fc;padding:12px;border-radius:8px;font-size:.75rem;max-height:400px;overflow:auto;white-space:pre-wrap}
+        .toast{position:fixed;top:20px;right:20px;background:#27ae60;color:#fff;padding:14px 24px;border-radius:10px;font-size:.85rem;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);display:none;animation:slideIn .3s}
+        .toast.err{background:#e74c3c}
+        @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+        .modal.show{display:flex}
+        .modal-box{background:#fff;border-radius:16px;padding:28px;width:90%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+        .modal-box h3{font-size:1.05rem;margin-bottom:14px}
+        .modal-box input,.modal-box select{margin-bottom:10px}
+        .modal-box .btn{width:100%;margin-top:4px}
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        @media(max-width:768px){.sidebar{width:60px}.sidebar .menu-item span{display:none}.container{flex-direction:column}.sidebar{width:100%;border-right:none;padding:8px 0}.sidebar .menu{display:flex;gap:4px;overflow-x:auto;padding:0 12px}.sidebar .menu-item{white-space:nowrap;padding:8px 12px}.grid-2{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="login-screen" id="loginScreen"><div class="login-box">
+    <h2>🔐 Đăng nhập Quản trị</h2>
+    <div class="error" id="loginError"></div>
+    <input type="text" id="loginUser" placeholder="Tên đăng nhập" value="admin">
+    <input type="password" id="loginPass" placeholder="Mật khẩu" value="admin123">
+    <button class="btn btn-primary" onclick="doLogin()">Đăng nhập</button>
+    <p style="text-align:center;font-size:.72rem;color:#999;margin-top:8px">Admin: admin/admin123</p>
+</div></div>
+
+<div class="app-screen" id="appScreen">
+<div class="header">
+    <div class="logo">🏛️ <span>Yongin</span> · Quản trị</div>
+    <div class="right"><span id="adminName">Admin</span> <div class="avatar">A</div></div>
+</div>
+<div class="container">
+    <div class="sidebar">
+        <div class="menu">
+            <div class="menu-item active" onclick="showPage('dashboard',this)"><span class="icon">📊</span><span>Dashboard</span></div>
+            <div class="menu-item" onclick="showPage('staff',this)"><span class="icon">👤</span><span>Nhân sự</span></div>
+            <div class="menu-item" onclick="showPage('reports',this)"><span class="icon">📋</span><span>Báo cáo</span></div>
+            <div class="menu-item" onclick="showPage('patrons-mgmt',this)"><span class="icon">👥</span><span>Bạn đọc</span></div>
+        </div>
+        <div class="divider"></div>
+        <div class="menu">
+            <div class="menu-item" onclick="showPage('config',this)"><span class="icon">⚙️</span><span>Cấu hình</span></div>
+            <div class="menu-item" onclick="showPage('standards',this)"><span class="icon">📚</span><span>DM chuẩn</span></div>
+        </div>
+        <div class="divider"></div>
+        <div class="menu">
+            <div class="menu-item" onclick="logout()"><span class="icon">🚪</span><span>Đăng xuất</span></div>
+        </div>
+    </div>
+    
+    <div class="main">
+        <!-- DASHBOARD -->
+        <div class="page active" id="page-dashboard">
+            <div class="stats" id="dashStats"><div class="stat-card"><div class="num">—</div><div class="label">Đầu tài liệu</div></div><div class="stat-card"><div class="num">—</div><div class="label">Bản sao</div></div><div class="stat-card"><div class="num">—</div><div class="label">Bạn đọc</div></div><div class="stat-card"><div class="num">—</div><div class="label">Nhân viên</div></div><div class="stat-card"><div class="num">—</div><div class="label">Đang mượn</div></div><div class="stat-card overdue"><div class="num">—</div><div class="label">Quá hạn</div></div></div>
+            <div class="grid-2">
+                <div class="card"><h3>🔑 Từ khóa tìm kiếm hot</h3><div id="popularKeywords"><p style="color:#888;font-size:.85rem">Đang tải...</p></div></div>
+                <div class="card"><h3>📈 Thống kê nhanh</h3><div id="quickStats" style="font-size:.85rem;color:#555;line-height:1.8"><p>Đang tải...</p></div></div>
+            </div>
+        </div>
+        
+        <!-- STAFF -->
+        <div class="page" id="page-staff">
+            <div class="card">
+                <div class="hdr"><h3>👤 Quản lý nhân sự</h3><button class="btn btn-primary" onclick="showAddStaff()">+ Thêm thủ thư</button></div>
+                <div id="staffList"><p style="color:#888;font-size:.85rem">Đang tải...</p></div>
+            </div>
+        </div>
+
+        <!-- PATRONS MANAGEMENT -->
+        <div class="page" id="page-patrons-mgmt">
+            <div class="card">
+                <div class="hdr"><h3>👥 Quản lý bạn đọc</h3></div>
+                <div class="row"><input type="text" id="adminPatronSearch" placeholder="Tìm kiếm bạn đọc..."><button class="btn btn-primary btn-sm" onclick="searchPatronsAdmin()">Tìm</button></div>
+                <div id="adminPatronResult"></div>
+            </div>
+        </div>
+        
+        <!-- REPORTS -->
+        <div class="page" id="page-reports">
+            <div class="card">
+                <div class="tab-bar">
+                    <button class="active" onclick="loadReport('overview',this)">📊 Tổng quan</button>
+                    <button onclick="loadReport('circulation',this)">🔄 Mượn/trả</button>
+                    <button onclick="loadReport('new-acquisitions',this)">📥 Bổ sung</button>
+                    <button onclick="loadReport('cataloging-stats',this)">📝 Biên mục</button>
+                    <button onclick="loadReport('ddc-stats',this)">🏷️ DDC</button>
+                    <button onclick="loadReport('language-stats',this)">🌐 Ngôn ngữ</button>
+                </div>
+                <div id="reportContent"><p style="color:#888;font-size:.85rem">🔍 Chọn loại báo cáo</p></div>
+            </div>
+        </div>
+        
+        <!-- CONFIG -->
+        <div class="page" id="page-config">
+            <div class="card">
+                <div class="hdr"><h3>⚙️ Cấu hình hệ thống</h3><button class="btn btn-outline btn-sm" onclick="loadConfig()">🔄 Refresh</button></div>
+                <div id="configList"><p style="color:#888;font-size:.85rem">Đang tải...</p></div>
+            </div>
+        </div>
+        
+        <!-- STANDARDS -->
+        <div class="page" id="page-standards">
+            <div class="card">
+                <div class="tab-bar">
+                    <button class="active" onclick="loadStandard('cutter',this)">📖 Bảng Cutter</button>
+                    <button onclick="loadStandard('languages',this)">🌐 Ngôn ngữ</button>
+                    <button onclick="loadStandard('shelves',this)">🏪 Kho</button>
+                </div>
+                <div id="standardContent"><p style="color:#888;font-size:.85rem">📚 Chọn danh mục</p></div>
+            </div>
+        </div>
+    </div>
+</div></div>
+
+<!-- ADD STAFF MODAL -->
+<div class="modal" id="addStaffModal"><div class="modal-box">
+    <h3>➕ Thêm thủ thư mới</h3>
+    <input type="text" id="newStaffUser" placeholder="Tên đăng nhập *">
+    <input type="password" id="newStaffPass" placeholder="Mật khẩu *">
+    <input type="text" id="newStaffName" placeholder="Họ tên *">
+    <input type="email" id="newStaffEmail" placeholder="Email">
+    <select id="newStaffRole"><option value="2">Thủ thư</option><option value="1">Admin</option></select>
+    <div class="row" style="margin-top:6px"><button class="btn btn-success" onclick="addStaff()">✅ Tạo tài khoản</button><button class="btn btn-outline" onclick="hideModal('addStaffModal')">Hủy</button></div>
+</div></div>
+
+<!-- EDIT STAFF MODAL -->
+<div class="modal" id="editStaffModal"><div class="modal-box">
+    <h3>✏️ Cập nhật nhân viên</h3>
+    <input type="hidden" id="editStaffId">
+    <input type="text" id="editStaffName" placeholder="Họ tên">
+    <input type="email" id="editStaffEmail" placeholder="Email">
+    <select id="editStaffStatus"><option value="active">Hoạt động</option><option value="suspended">Khóa</option></select>
+    <div class="row" style="margin-top:6px"><button class="btn btn-primary" onclick="updateStaff()">💾 Lưu</button><button class="btn btn-outline" onclick="hideModal('editStaffModal')">Hủy</button></div>
+</div></div>
+
+<script>
+let TOKEN = '';
+
+function toast(msg, isErr){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(isErr?' err':'');t.style.display='block';setTimeout(()=>t.style.display='none',3000)}
+function hideModal(id){document.getElementById(id).classList.remove('show')}
+function showModal(id){document.getElementById(id).classList.add('show')}
+
+async function doLogin(){
+    const u=document.getElementById('loginUser').value,p=document.getElementById('loginPass').value,err=document.getElementById('loginError');err.style.display='none'
+    try{
+        const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});const d=await r.json()
+        if(d.accessToken){TOKEN=d.accessToken;document.getElementById('loginScreen').style.display='none';document.getElementById('appScreen').style.display='block';document.getElementById('adminName').textContent=d.user.fullName;document.querySelector('.avatar').textContent=d.user.fullName.charAt(0).toUpperCase();loadDashboard();loadStaff();loadConfig();toast('✅ Đăng nhập thành công!')}
+        else{err.textContent=d.message||'Sai tài khoản';err.style.display='block'}
+    }catch(e){err.textContent='Lỗi: '+e.message;err.style.display='block'}
+}
+function auth(){return{headers:{'Authorization':`Bearer ${TOKEN}`,'Content-Type':'application/json'}}}
+function showPage(name,btn){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active')
+    document.querySelectorAll('.sidebar .menu-item').forEach(m=>m.classList.remove('active'));if(btn)btn.classList.add('active')
+    if(name==='patrons-mgmt') searchPatronsAdmin()
+}
+
+async function loadDashboard(){
+    try{
+        const r=await fetch('/api/admin/dashboard',auth());const d=await r.json()
+        document.getElementById('dashStats').innerHTML=`
+            <div class="stat-card"><div class="num">${d.total_titles||0}</div><div class="label">📚 Đầu tài liệu</div></div>
+            <div class="stat-card"><div class="num">${d.total_items||0}</div><div class="label">📦 Bản sao</div></div>
+            <div class="stat-card"><div class="num">${d.total_patrons||0}</div><div class="label">👤 Bạn đọc</div></div>
+            <div class="stat-card"><div class="num">${d.total_staff||0}</div><div class="label">👑 Nhân viên</div></div>
+            <div class="stat-card"><div class="num">${d.active_checkouts||0}</div><div class="label">🔄 Đang mượn</div></div>
+            <div class="stat-card overdue"><div class="num">${d.overdue_count||0}</div><div class="label">⏰ Quá hạn</div></div>`;
+        document.getElementById('quickStats').innerHTML=`
+            📊 <strong>Tháng này:</strong> ${d.monthly_checkouts||0} lượt mượn<br>
+            📈 <strong>Tỷ lệ quá hạn:</strong> ${d.active_checkouts>0?Math.round(d.overdue_count/d.active_checkouts*100):0}%<br>
+            👤 <strong>Bạn đọc/ nhân viên:</strong> ${((d.total_patrons||0)/(d.total_staff||1)).toFixed(0)}:1<br>
+            📚 <strong>Bản sao/ đầu:</strong> ${d.total_titles>0?(d.total_items/d.total_titles).toFixed(1):0}`;
+    }catch(e){console.log(e)}
+    try{
+        const k=await fetch('/api/admin/popular-keywords',auth());const kd=await k.json()
+        document.getElementById('popularKeywords').innerHTML=kd.length?`
+            <table><tr><th>Từ khóa</th><th>Lượt tìm</th></tr>
+            ${kd.slice(0,8).map(k=>`<tr><td>🔍 ${k.query}</td><td><span class="badge badge-blue">${k.search_count}</span></td></tr>`).join('')}</table>`
+            :'<p style="color:#888;font-size:.85rem">Chưa có dữ liệu</p>'
+    }catch(e){}
+}
+
+async function loadStaff(){
+    try{
+        const r=await fetch('/api/admin/staff',auth());const d=await r.json()
+        document.getElementById('staffList').innerHTML=d.length?`
+            <table><tr><th>Username</th><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Trạng thái</th><th>Thao tác</th></tr>
+            ${d.map(u=>`<tr>
+                <td><strong>${u.username}</strong></td><td>${u.full_name}</td><td style="font-size:.78rem">${u.email||''}</td>
+                <td><span class="badge ${u.role_name==='admin'?'badge-purple':'badge-blue'}">${u.role_name}</span></td>
+                <td><span class="badge ${u.status==='active'?'badge-green':'badge-red'}">${u.status==='active'?'Hoạt động':'Khóa'}</span></td>
+                <td>
+                    <button class="btn btn-outline btn-sm" onclick='editStaff(${JSON.stringify(u).replace(/'/g,"\\'")})'>✏️</button>
+                    ${u.username!=='admin'?`<button class="btn btn-danger btn-sm" onclick="deleteStaff(${u.id},'${u.username}')">🗑️</button>`:''}
+                </td>
+            </tr>`).join('')}</table>`:'<p>Chưa có nhân viên</p>'
+    }catch(e){}
+}
+
+function showAddStaff(){showModal('addStaffModal')}
+async function addStaff(){
+    const username=document.getElementById('newStaffUser').value,password=document.getElementById('newStaffPass').value
+    const fullName=document.getElementById('newStaffName').value,email=document.getElementById('newStaffEmail').value
+    const roleId=parseInt(document.getElementById('newStaffRole').value)
+    if(!username||!password||!fullName){toast('Vui lòng nhập đầy đủ thông tin',true);return}
+    try{
+        const r=await fetch('/api/auth/register',{method:'POST',...auth(),body:JSON.stringify({username,password,fullName,email:email||undefined,roleId})});const d=await r.json()
+        if(d.id){toast(`✅ Đã tạo tài khoản ${d.username}`);hideModal('addStaffModal');loadStaff()}
+        else toast(d.message||'Lỗi tạo tài khoản',true)
+    }catch(e){toast('Lỗi: '+e.message,true)}
+}
+
+function editStaff(u){
+    document.getElementById('editStaffId').value=u.id;document.getElementById('editStaffName').value=u.full_name
+    document.getElementById('editStaffEmail').value=u.email||'';document.getElementById('editStaffStatus').value=u.status
+    showModal('editStaffModal')
+}
+async function updateStaff(){
+    const id=document.getElementById('editStaffId').value
+    try{
+        const r=await fetch(`/api/admin/staff/${id}/status`,{method:'PUT',...auth(),body:JSON.stringify({status:document.getElementById('editStaffStatus').value})});const d=await r.json()
+        toast(d.message||'Đã cập nhật');hideModal('editStaffModal');loadStaff()
+    }catch(e){toast('Lỗi: '+e.message,true)}
+}
+async function deleteStaff(id,username){
+    if(!confirm(`Xóa tài khoản "${username}"?`))return
+    try{
+        const r=await fetch(`/api/admin/staff/${id}`,{method:'DELETE',...auth()});const d=await r.json()
+        toast(d.message||'Đã xóa');loadStaff()
+    }catch(e){toast('Lỗi: '+e.message,true)}
+}
+
+async function searchPatronsAdmin(){
+    const q=document.getElementById('adminPatronSearch').value||'TV';const url=`/api/patron/search?q=${encodeURIComponent(q)}`
+    try{
+        const r=await fetch(url,{headers:{'Authorization':`Bearer ${TOKEN}`}});const d=await r.json()
+        document.getElementById('adminPatronResult').innerHTML=d.results?.length?`
+            <table><tr><th>Mã thẻ</th><th>Họ tên</th><th>Email</th><th>ĐT</th><th>Loại</th><th>Đang mượn</th><th>Trạng thái</th></tr>
+            ${d.results.map(p=>`<tr>
+                <td><strong>${p.card_barcode}</strong></td><td>${p.full_name}</td><td style="font-size:.78rem">${p.email||''}</td>
+                <td>${p.phone||''}</td><td><span class="badge badge-blue">${p.patron_type==='child'?'TN':'NL'}</span></td>
+                <td>${p.active_checkouts||0}</td><td><span class="badge ${p.status==='active'?'badge-green':'badge-red'}">${p.status}</span></td>
+            </tr>`).join('')}</table><p style="font-size:.78rem;color:#888;margin-top:6px">Tổng: ${d.total} bạn đọc</p>`
+            :'<p style="color:#888;font-size:.85rem;padding:8px">Không tìm thấy</p>'
+    }catch(e){document.getElementById('adminPatronResult').innerHTML='<div style="color:#e74c3c">❌ Lỗi: '+e.message+'</div>'}
+}
+
+function logout(){
+    if(!confirm('🔒 Đăng xuất?\nBạn sẽ cần đăng nhập lại để tiếp tục.'))return
+    TOKEN='';document.getElementById('appScreen').style.display='none';document.getElementById('loginScreen').style.display='flex'
+    document.getElementById('loginUser').value='admin';document.getElementById('loginPass').value='admin123'
+}
+
+async function loadConfig(){
+    try{const r=await fetch('/api/admin/config',auth());const d=await r.json()
+        document.getElementById('configList').innerHTML=d.length?`
+            <table><tr><th>Key</th><th>Giá trị</th><th>Mô tả</th></tr>
+            ${d.map(c=>`<tr><td style="font-family:monospace;font-size:.75rem">${c.key}</td><td><strong>${c.value}</strong></td><td style="font-size:.75rem;color:#888">${c.description||''}</td></tr>`).join('')}</table>`
+            :'<p>Chưa có cấu hình</p>'
+    }catch(e){}
+}
+
+async function loadReport(type,btn){
+    document.querySelectorAll('#page-reports .tab-bar button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active')
+    try{
+        const r=await fetch(`/api/admin/reports/${type}`,auth());const d=await r.json()
+        const data = d.data;
+        if(!data){document.getElementById('reportContent').innerHTML='<p style="color:#888;font-size:.85rem">Không có dữ liệu</p>';return}
+        // Nếu data là object (overview) → hiển thị dạng key-value
+        if(!Array.isArray(data)){
+            document.getElementById('reportContent').innerHTML=`
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                ${Object.entries(data).map(([k,v])=>`
+                    <div style="background:#f8f9fc;border-radius:8px;padding:12px">
+                        <div style="font-size:.75rem;color:#888;text-transform:uppercase">${k.replace(/_/g,' ')}</div>
+                        <div style="font-size:1.4rem;font-weight:700;color:#0f3460;margin-top:4px">${v}</div>
+                    </div>`).join('')}
+                </div>`;return
+        }
+        // Nếu data là array → hiển thị bảng
+        if(data.length>0){
+            const keys=Object.keys(data[0]);const headers=keys.map(k=>`<th>${k}</th>`).join('')
+            const rows=data.slice(0,100).map(row=>`<tr>${keys.map(k=>`<td>${row[k]!==null&&row[k]!==undefined?row[k]:''}</td>`).join('')}</tr>`).join('')
+            document.getElementById('reportContent').innerHTML=`
+                <table><tr>${headers}</tr>${rows}</table>
+                <p style="color:#888;font-size:.75rem;margin-top:6px">📊 Hiển thị ${Math.min(data.length,100)}/${data.length} dòng</p>`
+        } else document.getElementById('reportContent').innerHTML='<p style="color:#888;font-size:.85rem">Không có dữ liệu</p>'
+    }catch(e){document.getElementById('reportContent').innerHTML='<div style="color:#e74c3c">❌ Lỗi: '+e.message+'</div>'}
+}
+
+async function loadStandard(type,btn){
+    document.querySelectorAll('#page-standards .tab-bar button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active')
+    try{const r=await fetch(`/api/admin/standards/${type}`,auth());const d=await r.json()
+        if(d.length>0){
+            const keys=Object.keys(d[0]);const headers=keys.map(k=>`<th>${k}</th>`).join('')
+            const rows=d.slice(0,150).map(row=>`<tr>${keys.map(k=>`<td>${row[k]||''}</td>`).join('')}</tr>`).join('')
+            document.getElementById('standardContent').innerHTML=`<table><tr>${headers}</tr>${rows}</table><p style="color:#888;font-size:.75rem;margin-top:6px">📋 ${d.length} dòng</p>`
+        }else document.getElementById('standardContent').innerHTML='<p style="color:#888;font-size:.85rem">Không có dữ liệu</p>'
+    }catch(e){}
+}
+</script>
+</body>
+</html>
