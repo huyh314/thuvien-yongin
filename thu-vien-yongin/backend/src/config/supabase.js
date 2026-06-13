@@ -10,7 +10,6 @@
  * Anon key dùng ở frontend — có RLS
  */
 const { createClient } = require('@supabase/supabase-js');
-const ws = require('ws');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
@@ -32,7 +31,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
     autoRefreshToken: false,
     persistSession: false,
   },
-  realtime: { transport: ws },
+  realtime: { enabled: false },
 });
 
 // Anon client — dùng cho public operations (nếu cần)
