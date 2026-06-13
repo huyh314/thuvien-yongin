@@ -2,6 +2,9 @@
   "name": "thu-vien-yongin",
   "version": "1.0.0",
   "description": "Phần mềm Thư viện số cộng đồng Yongin",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "start": "node backend/src/app.js",
     "dev": "cd backend && npm run dev"
