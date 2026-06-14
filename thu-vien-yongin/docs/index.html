@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư viện Yongin — Giới thiệu hệ thống</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.7;
+        }
+
+        /* ─── HEADER ─── */
+        .header {
+            background: linear-gradient(135deg, #0f3460 0%, #1a56db 50%, #2563eb 100%);
+            color: #fff;
+            padding: 48px 20px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,.06) 0%, transparent 60%);
+        }
+        .header h1 { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 800; position: relative; letter-spacing: -.5px; }
+        .header h1 span { color: #60a5fa; }
+        .header p { font-size: 1.1rem; opacity: .9; margin-top: 8px; max-width: 680px; margin-inline: auto; position: relative; }
+        .header .meta { margin-top: 16px; font-size: .85rem; opacity: .6; }
+
+        /* ─── NAV TABS ─── */
+        .nav-wrap {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 2px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 12px;
+        }
+        .nav-tabs a {
+            flex: 0 0 auto;
+            padding: 14px 18px;
+            font-size: .88rem;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all .2s;
+        }
+        .nav-tabs a:hover { color: #0f3460; background: #f1f5f9; }
+        .nav-tabs a.active { color: #0f3460; border-bottom-color: #0f3460; font-weight: 600; }
+
+        /* ─── CONTAINER ─── */
+        .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+
+        /* ─── SECTIONS ─── */
+        section { display: none; scroll-margin-top: 70px; }
+        section.active { display: block; animation: fadeIn .3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0f3460;
+            margin-bottom: 6px;
+        }
+        .section-desc {
+            color: #64748b;
+            font-size: .95rem;
+            margin-bottom: 28px;
+        }
+
+        /* ─── CARDS ─── */
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
+            margin-bottom: 24px;
+            overflow: hidden;
+            border: 1px solid #f1f5f9;
+        }
+        .card-header {
+            padding: 18px 24px 14px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .card-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0f3460;
+        }
+        .card-header h2 small {
+            font-weight: 400;
+            color: #94a3b8;
+            font-size: .8rem;
+            margin-left: 8px;
+        }
+        .card-header p { font-size: .85rem; color: #64748b; margin-top: 2px; }
+        .card-body { padding: 20px 24px 24px; }
+
+        /* ─── GRID ─── */
+        .grid-2, .grid-3, .grid-4 {
+            display: grid;
+            gap: 16px;
+        }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+
+        /* ─── FEATURE BOX ─── */
+        .feature {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 16px 20px;
+            border-left: 4px solid #0f3460;
+            height: 100%;
+        }
+        .feature h3 { font-size: .95rem; font-weight: 700; margin-bottom: 6px; color: #1e293b; }
+        .feature p, .feature li { font-size: .85rem; color: #475569; }
+        .feature ul { list-style: none; padding: 0; margin-top: 6px; }
+        .feature ul li { padding: 3px 0 3px 20px; position: relative; }
+        .feature ul li::before { content: '✓'; position: absolute; left: 0; color: #22c55e; font-weight: 700; }
+
+        /* ─── PROCESS FLOW ─── */
+        .process-flow {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            align-items: center; justify-content: center; padding: 16px 0;
+        }
+        .step {
+            display: flex; align-items: center; gap: 6px;
+            background: #f1f5f9; border-radius: 30px;
+            padding: 7px 14px 7px 8px;
+            font-size: .82rem; font-weight: 600;
+        }
+        .step .num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; border-radius: 50%;
+            background: #0f3460; color: #fff; font-size: .72rem; font-weight: 700;
+        }
+        .step .num.green { background: #22c55e; }
+        .step .num.red { background: #ef4444; }
+        .step .num.orange { background: #f97316; }
+        .arrow { font-size: 1.1rem; color: #cbd5e1; }
+
+        /* ─── TABLES ─── */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+        th {
+            background: #f1f5f9; text-align: left; padding: 10px 14px;
+            font-weight: 600; font-size: .8rem; text-transform: uppercase;
+            letter-spacing: .3px; color: #475569;
+        }
+        td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; }
+        tr:hover td { background: #f8fafc; }
+
+        .badge {
+            display: inline-block; padding: 2px 10px; border-radius: 20px;
+            font-size: .75rem; font-weight: 600;
+        }
+        .badge.green { background: #dcfce7; color: #166534; }
+        .badge.blue { background: #dbeafe; color: #1e40af; }
+        .badge.red { background: #fee2e2; color: #991b1b; }
+        .badge.yellow { background: #fef9c3; color: #854d0e; }
+        .badge.purple { background: #f3e8ff; color: #6b21a8; }
+
+        /* ─── MOCK SCREEN ─── */
+        .mock-screen {
+            background: #1e293b;
+            border-radius: 10px;
+            padding: 16px 18px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: .78rem;
+            line-height: 1.5;
+            color: #94a3b8;
+            overflow-x: auto;
+            margin: 12px 0;
+            white-space: nowrap;
+        }
+        .mock-screen .hl { color: #fbbf24; }
+        .mock-screen .hl2 { color: #34d399; }
+        .mock-screen .dim { color: #64748b; }
+        .mock-screen .sep { border-top: 1px dashed #334155; margin: 4px 0; display: block; }
+
+        /* ─── DIAGRAM BOX ─── */
+        .diagram-box {
+            background: #f8fafc;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin: 12px 0;
+            font-size: .88rem;
+            color: #475569;
+        }
+
+        /* ─── ROLE HEADER ─── */
+        .role-header {
+            display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+        }
+        .role-header .avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0;
+        }
+        .role-header .avatar.reader { background: #dbeafe; }
+        .role-header .avatar.librarian { background: #dcfce7; }
+        .role-header .avatar.admin { background: #fce4ec; }
+
+        /* ─── MARC21 TAG COLORS ─── */
+        .marc-tag { color: #ef4444; font-weight: 700; }
+        .marc-ind { color: #8b5cf6; }
+        .marc-sub { color: #22c55e; }
+        .marc-val { color: #1e293b; }
+
+        /* ─── STATS GRID ─── */
+        .stat-box {
+            text-align: center; padding: 18px; background: #f8fafc; border-radius: 10px;
+        }
+        .stat-box .num { font-size: 2rem; font-weight: 700; color: #0f3460; }
+        .stat-box .label { font-size: .82rem; color: #64748b; margin-top: 4px; }
+
+        /* ─── MOBILE ─── */
+        @media (max-width: 640px) {
+            .header { padding: 32px 16px 28px; }
+            .nav-tabs a { padding: 12px 14px; font-size: .82rem; }
+            .container { padding: 20px 14px 60px; }
+            .card-body { padding: 16px; }
+            .card-header { padding: 14px 16px 12px; }
+            .mock-screen { font-size: .68rem; padding: 12px; }
+        }
+
+        /* ─── PRINT ─── */
+        @media print {
+            .nav-wrap { display: none; }
+            section { display: block !important; }
+            .header { padding: 20px; }
+        }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: #94a3b8;
+            font-size: .85rem;
+            border-top: 1px solid #e2e8f0;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .footer a { color: #0f3460; text-decoration: none; }
+
+        /* ─── RESPONSIVE TABLE ─── */
+        @media (max-width: 640px) {
+            table { font-size: .78rem; }
+            th, td { padding: 6px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+    <h1>🏛️ Phần Mềm <span>Thư Viện Yongin</span></h1>
+    <p>Kiến trúc, trải nghiệm & quy trình nghiệp vụ — Hệ thống quản lý thư viện số cộng đồng</p>
+    <div class="meta">Phiên bản 1.0 · Dựa trên tài liệu Thư viện Đà Nẵng 2025–2026 · Thiết kế cho đội phát triển</div>
+</div>
+
+<!-- ==================== NAVIGATION ==================== -->
+<div class="nav-wrap">
+    <nav class="nav-tabs" id="tabNav">
+        <a href="#overview" class="active" data-tab="overview">📊 Tổng quan</a>
+        <a href="#reader" data-tab="reader">👤 Bạn đọc</a>
+        <a href="#librarian" data-tab="librarian">🧑‍🏫 Thủ thư</a>
+        <a href="#admin" data-tab="admin">🔐 Quản trị</a>
+        <a href="#process" data-tab="process">🔄 Quy trình</a>
+        <a href="#marc21" data-tab="marc21">📝 MARC21</a>
+        <a href="#modules" data-tab="modules">🧩 Kiến trúc</a>
+    </nav>
+</div>
+
+<div class="container">
+
+<!-- ================================================================ -->
+<!-- TAB 1: TỔNG QUAN -->
+<!-- ================================================================ -->
+<section id="overview" class="active">
+
+<h2 class="section-title">📊 Tổng quan hệ thống</h2>
+<p class="section-desc">Ba cổng, năm phân hệ, tám bước quy trình — toàn bộ bức tranh Phần mềm Thư viện Yongin.</p>
+
+<div class="card">
+    <div class="card-header"><h2>🏗️ Kiến trúc 3 cổng</h2></div>
+    <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;text-align:center;">
+            <div style="background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:10px;padding:20px;color:#fff;">
+                <div style="font-size:2rem;margin-bottom:4px;">👤</div>
+                <div style="font-weight:700;font-size:1rem;">Cổng Bạn đọc</div>
+                <div style="font-size:.72rem;opacity:.75;">Tra cứu · Mượn/Trả · Cá nhân</div>
+            </div>
+            <div style="background:linear-gradient(135deg,#16a34a,#15803d);border-radius:10px;padding:20px;color:#fff;">
+                <div style="font-size:2rem;margin-bottom:4px;">🧑‍🏫</div>
+                <div style="font-weight:700;font-size:1rem;">Cổng Thủ thư</div>
+                <div style="font-size:.72rem;opacity:.75;">Biên mục · Lưu thông · Kho</div>
+            </div>
+            <div style="background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:10px;padding:20px;color:#fff;">
+                <div style="font-size:2rem;margin-bottom:4px;">🔐</div>
+                <div style="font-weight:700;font-size:1rem;">Cổng Quản trị</div>
+                <div style="font-size:.72rem;opacity:.75;">Quản lý · Báo cáo · Cấu hình</div>
+            </div>
+        </div>
+        <div style="margin-top:14px;padding:12px;background:#f1f5f9;border-radius:8px;text-align:center;font-size:.85rem;color:#475569;">
+            <strong>⬇ Hệ thống CSDL trung tâm:</strong> MARC21 · ISO 2709 · Dublin Core · DDC 23 · Bảng Cutter · Từ khóa TVQG
+        </div>
+    </div>
+</div>
+
+<div class="grid-3">
+    <div class="card">
+        <div class="card-header" style="border-left:4px solid #2563eb;"><h2>👤 Bạn đọc <small>Reader</small></h2><p>Người dân, học sinh, sinh viên</p></div>
+        <div class="card-body">
+            <ul style="list-style:none;padding:0;font-size:.88rem;">
+                <li style="padding:3px 0;">🔍 Tra cứu tài liệu (cơ bản, nâng cao, Boolean)</li>
+                <li style="padding:3px 0;">📖 Chi tiết tài liệu (MARC21, Dublin Core)</li>
+                <li style="padding:3px 0;">📚 Mượn/trả/gia hạn tài liệu</li>
+                <li style="padding:3px 0;">❤️ Yêu thích & đánh giá sách</li>
+                <li style="padding:3px 0;">🔔 Thông báo hạn trả, sách mới</li>
+                <li style="padding:3px 0;">🆔 Thẻ thư viện số (QR/mã vạch)</li>
+            </ul>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" style="border-left:4px solid #16a34a;"><h2>🧑‍🏫 Thủ thư <small>Librarian</small></h2><p>Cán bộ biên mục, lưu thông, kho</p></div>
+        <div class="card-body">
+            <ul style="list-style:none;padding:0;font-size:.88rem;">
+                <li style="padding:3px 0;">📥 Tiếp nhận & xử lý sơ bộ tài liệu</li>
+                <li style="padding:3px 0;">📝 Biên mục MARC21 với gợi ý thông minh</li>
+                <li style="padding:3px 0;">🏷️ Phân loại DDC 23, mã hóa Cutter</li>
+                <li style="padding:3px 0;">🔄 Mượn/trả qua mã vạch/RFID</li>
+                <li style="padding:3px 0;">🏪 Quản lý kho, kiểm kê, thanh lý</li>
+                <li style="padding:3px 0;">🖨️ In nhãn, mã vạch, tải ảnh bìa</li>
+            </ul>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" style="border-left:4px solid #dc2626;"><h2>🔐 Quản trị <small>Admin</small></h2><p>Giám đốc, trưởng phòng, quản trị CNTT</p></div>
+        <div class="card-body">
+            <ul style="list-style:none;padding:0;font-size:.88rem;">
+                <li style="padding:3px 0;">📊 Dashboard tổng quan toàn hệ thống</li>
+                <li style="padding:3px 0;">👤 Quản lý nhân sự & phân quyền</li>
+                <li style="padding:3px 0;">📋 Báo cáo thống kê (xuất Excel)</li>
+                <li style="padding:3px 0;">⚙️ Cấu hình danh mục chuẩn</li>
+                <li style="padding:3px 0;">🔗 Kết nối TVQG, liên thông</li>
+                <li style="padding:3px 0;">📜 Nhật ký hoạt động, log hệ thống</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>🧩 5 Phân hệ nghiệp vụ cốt lõi</h2></div>
+    <div class="card-body">
+        <div class="grid-2">
+            <div class="feature"><h3>1. Biên mục (Cataloging)</h3><p>Biên mục MARC21, AACR2, ISBD, đa khung PL (DDC/UDC/BBK/LC/NLM), xuất/nhập ISO 2709, Dublin Core.</p></div>
+            <div class="feature"><h3>2. Lưu thông (Circulation)</h3><p>Mượn/trả/gia hạn, chính sách phục vụ, thống kê, phí quá hạn, RFID.</p></div>
+            <div class="feature"><h3>3. Bạn đọc (Patron Mgmt)</h3><p>Hồ sơ bạn đọc, phân quyền, in thẻ mã vạch, lịch sử giao dịch.</p></div>
+            <div class="feature"><h3>4. Quản lý Kho (Collection)</h3><p>Cấu trúc kho, kiểm kê, thanh lý, chuyển kho, RFID, vị trí giá sách.</p></div>
+            <div class="feature" style="grid-column:1/-1;"><h3>5. OPAC — Tra cứu trực tuyến</h3><p>Tìm cơ bản/nâng cao/Boolean/Full-text, tiếng Việt không dấu, gợi ý, chính tả, xem MARC21/DC.</p></div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📈 Quy mô hệ thống</h2></div>
+    <div class="card-body">
+        <div class="grid-4">
+            <div class="stat-box"><div class="num">~30</div><div class="label">Trường MARC21 quan trọng</div></div>
+            <div class="stat-box"><div class="num">8</div><div class="label">Bước xử lý TNTT</div></div>
+            <div class="stat-box"><div class="num">~80</div><div class="label">Vần trong bảng Cutter</div></div>
+            <div class="stat-box"><div class="num">~60</div><div class="label">Mã ngôn ngữ hỗ trợ</div></div>
+        </div>
+    </div>
+</div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- TAB 2: BẠN ĐỌC -->
+<!-- ================================================================ -->
+<section id="reader">
+<div class="role-header">
+    <div class="avatar reader">👤</div>
+    <div><h2 class="section-title" style="margin-bottom:0;">Cổng Bạn đọc <span style="font-size:.9rem;font-weight:400;color:#94a3b8;">Reader Portal — OPAC</span></h2><p style="color:#64748b;">Người dân, học sinh, sinh viên, nhà nghiên cứu</p></div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>🏠 Trang chủ OPAC</h2></div>
+    <div class="card-body">
+        <div class="mock-screen">
+┌────────────────────────────────────────────┐<br>
+│ 🏛️ THƯ VIỆN YONGIN    [🔍] [👤 ĐĂNG NHẬP] │<br>
+├────────────────────────────────────────────┤<br>
+│ ╔══════════════════════════════════════╗   │<br>
+│ ║  <span class="hl">🔍 Tìm kiếm tài liệu...</span>            ║   │<br>
+│ ║  [📖 TB] [✍️ TG] [📕 ND] [🏷️ CĐ]   ║   │<br>
+│ ╚══════════════════════════════════════╝   │<br>
+│ 📚 DANH MỤC: [Sách mới] [Bán chạy] [TN]  │<br>
+│ ⭐ Sách mới: Văn hóa VN · Tìm hiểu RFID  │<br>
+│ 📰 Tin tức: Ngày hội Sách Đà Nẵng 2026   │<br>
+└────────────────────────────────────────────┘<br>
+<span class="dim">Màn hình chính khi truy cập OPAC</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>🔍 Tìm kiếm & Kết quả</h2></div>
+    <div class="card-body">
+        <div class="grid-2">
+            <div class="feature"><h3>Cơ bản</h3><p>Một ô nhập, 4 tab (Toàn bộ/Tác giả/Nhan đề/Chủ đề). Auto-suggest khi gõ.</p></div>
+            <div class="feature"><h3>Nâng cao</h3><p>Form nhiều trường + toán tử AND/OR/NOT. Lọc theo năm, ngôn ngữ, kho.</p></div>
+            <div class="feature"><h3>Full-text</h3><p>Tìm trong toàn bộ nội dung file PDF/Word đã OCR. Kết quả kèm highlight.</p></div>
+            <div class="feature"><h3>Gợi ý</h3><p>Auto-suggest, kiểm tra chính tả, đề xuất từ khóa liên quan.</p></div>
+        </div>
+        <div class="mock-screen" style="margin-top:14px;">
+┌────────────────────────────────────────────┐<br>
+│ 🔍 KẾT QUẢ: <span class="hl">"văn hóa"</span> — 142 kết quả        │<br>
+│ 💡 Gợi ý: "văn hóa việt nam", "văn hóa đọc"│<br>
+├────────────────────────────────────────────┤<br>
+│ 📖 Văn hóa Việt Nam — Trần Quốc Vượng     │<br>
+│ NXB Văn hóa, 2023 · 456 tr. · ⭐ 4.5/5   │<br>
+│ 📍 Kho Mượn — <span class="hl2">✅ Còn 2 bản</span>               │<br>
+│ [📌 Lưu] [🔄 Đặt mượn]                     │<br>
+└────────────────────────────────────────────┘
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📖 Chi tiết tài liệu</h2></div>
+    <div class="card-body">
+        <p>Xem thông tin thư mục, tóm tắt, từ khóa, tình trạng kho. Hỗ trợ chuyển đổi giữa <strong>dạng cơ bản</strong>, <strong>MARC21</strong> và <strong>Dublin Core</strong>.</p>
+        <div class="grid-2" style="margin-top:14px;">
+            <div class="mock-screen" style="font-size:.74rem;">
+📖 VĂN HÓA VIỆT NAM<br>
+Trần Quốc Vượng · NXB Văn hóa - 2023<br>
+📄 456 tr., 24 cm · 🌐 Tiếng Việt<br>
+🆔 ISBN: 978-604-77-6729-8<br>
+<span class="sep"></span><br>
+🏷️ Văn hóa | Lịch sử | Việt Nam<br>
+📍 Kho Mượn — <span class="hl2">Còn 2 bản</span><br>
+⭐ 4.5/5 [📌 Lưu] [🔄 Đặt mượn]
+            </div>
+            <div class="feature">
+                <h3>📌 Trải nghiệm mượn sách</h3>
+                <ul>
+                    <li>Kiểm tra thẻ qua mã vạch/QR</li>
+                    <li>Tìm sách trên kệ (DDC + Cutter)</li>
+                    <li>Đem sách đến quầy thủ thư</li>
+                    <li>Quét mã vạch sách + thẻ</li>
+                    <li>Xác nhận mượn thành công</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>👤 Khu vực cá nhân</h2></div>
+    <div class="card-body">
+        <div class="grid-3">
+            <div class="feature"><h3>📚 Sách đang mượn</h3><p>Xem danh sách, ngày hạn trả, gia hạn.</p></div>
+            <div class="feature"><h3>📋 Lịch sử mượn/trả</h3><p>Tra cứu toàn bộ giao dịch.</p></div>
+            <div class="feature"><h3>❤️ Danh sách yêu thích</h3><p>Lưu sách, nhận thông báo.</p></div>
+            <div class="feature"><h3>🔔 Thông báo</h3><p>Sắp hạn, quá hạn, sách mới, sự kiện.</p></div>
+            <div class="feature"><h3>🆔 Thẻ thư viện số</h3><p>Mã QR/mã vạch thẻ hiển thị trên app.</p></div>
+            <div class="feature"><h3>⭐ Đánh giá</h3><p>Chấm điểm, viết review cho sách đã đọc.</p></div>
+        </div>
+    </div>
+</div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- TAB 3: THỦ THƯ -->
+<!-- ================================================================ -->
+<section id="librarian">
+<div class="role-header">
+    <div class="avatar librarian">🧑‍🏫</div>
+    <div><h2 class="section-title" style="margin-bottom:0;">Cổng Thủ thư <span style="font-size:.9rem;font-weight:400;color:#94a3b8;">Librarian Portal</span></h2><p style="color:#64748b;">Cán bộ biên mục, lưu thông, quản lý kho</p></div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📊 Bảng điều khiển Thủ thư</h2></div>
+    <div class="card-body">
+        <div class="mock-screen">
+┌────────────────────────────────────────────┐<br>
+│ 📊 BẢNG ĐIỀU KHIỂN    [🧑 Tiến] [🔔]     │<br>
+├────────────────────────────────────────────┤<br>
+│ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐     │<br>
+│ │📥 12 │ │📝 5  │ │🔄 8  │ │⏰ 3  │     │<br>
+│ │Chờ xử│ │Chờ   │ │GD hôm│ │Quá   │     │<br>
+│ │lý    │ │biên  │ │nay   │ │hạn   │     │<br>
+│ └──────┘ └──────┘ └──────┘ └──────┘     │<br>
+│ 🏠 [📥 TN] [📝 BM] [🔍 Tra] [🔄 LT]    │<br>
+└────────────────────────────────────────────┘
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2><span style="color:#ef4444;">📝</span> Phân hệ Biên mục MARC21</h2></div>
+    <div class="card-body">
+        <p style="margin-bottom:12px;"><strong>Quy trình:</strong> Tra trùng → Nhập MARC21 → Lưu biểu ghi → Chuyển in ấn</p>
+        <div class="mock-screen">
+┌────────────────────────────────────────────┐<br>
+│ 📝 BIÊN MỤC MARC21    Đợt: PN-2026-05     │<br>
+├────────────────────────────────────────────┤<br>
+│ ⚠️ Tra trùng: Văn hóa VN / Trần Quốc Vượng│<br>
+│ ✅ Kết quả: Tìm thấy 2 biểu ghi trùng!    │<br>
+│ ───────────────────────────────────────────│<br>
+│ [020] $a 9786047767298  $c 169000đ        │<br>
+│ [100] $a Trần Quốc Vượng                  │<br>
+│ [245] $a Văn hóa Việt Nam / $c ...        │<br>
+│ [260] $a Hà Nội : $b Thanh niên, $c 2023 │<br>
+│ [650] $a Văn hóa $2 TVQG                  │<br>
+│ [852] $b Kho Mượn $j M.102568            │<br>
+│ [💾 Lưu] [🔄 Lưu & thêm] [👁️ Xem trước]   │<br>
+└────────────────────────────────────────────┘
+        </div>
+        <div style="margin-top:12px;padding:12px;background:#fef9c3;border-radius:8px;font-size:.85rem;">
+            <strong>⚠️ Quy trình biên mục:</strong> Bắt buộc tra trùng CSDL &amp; TVQG trước. Nếu đã có → thêm ĐKCB. Chưa có → tải TVQG hoặc biên mục gốc.
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <div class="card-header"><h2>📤 Màn hình mượn sách</h2></div>
+        <div class="card-body">
+            <div class="mock-screen" style="font-size:.72rem;">
+📤 MƯỢN TÀI LIỆU      [📷 Quét mã]<br>
+👤 Nguyễn Văn A — TV000123<br>
+📊 Đang mượn: 2/5<br>
+─────────────────────────<br>
+✅ Văn hóa VN — M.102568<br>
+✅ Tìm hiểu RFID — M.203456<br>
+📅 Hạn: 20/06/2026<br>
+[✅ XÁC NHẬN] [❌ Hủy]
+            </div>
+            <p style="margin-top:8px;font-size:.82rem;color:#475569;"><strong>Luồng mượn:</strong> Quét thẻ → Kiểm tra hạn mức → Quét sách → Xác nhận</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header"><h2>🏪 Quản lý kho</h2></div>
+        <div class="card-body">
+            <div class="feature"><h3>Cấu trúc kho</h3><p>Kho Mượn, Kho Đọc, Kho Thiếu nhi, Kho Người lớn, Kho Số hóa</p></div>
+            <div class="feature" style="margin-top:8px;"><h3>Chức năng</h3><p>Chuyển kho, thanh lý, kiểm kê qua mã vạch, xem tồn kho</p></div>
+        </div>
+    </div>
+</div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- TAB 4: ADMIN -->
+<!-- ================================================================ -->
+<section id="admin">
+<div class="role-header">
+    <div class="avatar admin">🔐</div>
+    <div><h2 class="section-title" style="margin-bottom:0;">Cổng Quản trị <span style="font-size:.9rem;font-weight:400;color:#94a3b8;">Admin Portal</span></h2><p style="color:#64748b;">Giám đốc, trưởng phòng, quản trị viên CNTT</p></div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📊 Admin Dashboard</h2></div>
+    <div class="card-body">
+        <div class="grid-4" style="margin-bottom:16px;">
+            <div class="stat-box"><div class="num">25.430</div><div class="label">Đầu tài liệu</div></div>
+            <div class="stat-box"><div class="num">3.245</div><div class="label">Bạn đọc</div></div>
+            <div class="stat-box"><div class="num">1.230</div><div class="label">Mượn/tháng</div></div>
+            <div class="stat-box"><div class="num">156</div><div class="label">Chờ biên mục</div></div>
+        </div>
+        <div style="font-size:.85rem;color:#475569;">📈 Biểu đồ hoạt động 30 ngày: Mượn ████████████ 1.230 / Trả ████████████ 1.180 / Quá hạn ███ 230</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>👤 Quản lý nhân sự &amp; Phân quyền</h2></div>
+    <div class="card-body">
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Họ tên</th><th>Vai trò</th><th>Biên mục</th><th>Lưu thông</th><th>Kho</th><th>Admin</th><th>Trạng thái</th></tr></thead>
+                <tbody>
+                    <tr><td>Nguyễn Văn Tiến</td><td>Biên mục viên</td><td><span class="badge green">✅</span></td><td><span class="badge red">❌</span></td><td><span class="badge red">❌</span></td><td><span class="badge red">❌</span></td><td><span class="badge green">Hoạt động</span></td></tr>
+                    <tr><td>Trần Thị Mai</td><td>Thủ thư LT</td><td><span class="badge red">❌</span></td><td><span class="badge green">✅</span></td><td><span class="badge yellow">Một phần</span></td><td><span class="badge red">❌</span></td><td><span class="badge green">Hoạt động</span></td></tr>
+                    <tr><td>Lê Văn Phúc</td><td>Trưởng phòng NV</td><td><span class="badge green">✅</span></td><td><span class="badge green">✅</span></td><td><span class="badge green">✅</span></td><td><span class="badge green">Báo cáo</span></td><td><span class="badge green">Hoạt động</span></td></tr>
+                    <tr><td>Admin</td><td>Quản trị HT</td><td><span class="badge green">✅</span></td><td><span class="badge green">✅</span></td><td><span class="badge green">✅</span></td><td><span class="badge green">✅ Toàn quyền</span></td><td><span class="badge green">Hoạt động</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <div class="card-header"><h2>📊 Báo cáo thống kê</h2></div>
+        <div class="card-body">
+            <div class="feature"><h3>Định kỳ</h3><p>Tổng quan, tài liệu mới, mượn/trả, bạn đọc, quá hạn, kiểm kê, thanh lý</p></div>
+            <div class="feature" style="margin-top:8px;"><h3>Nghiệp vụ</h3><p>Khối lượng biên mục, DDC, ngôn ngữ, nhu cầu bạn đọc, cảnh báo tồn đọng</p></div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header"><h2>⚙️ Cấu hình hệ thống</h2></div>
+        <div class="card-body" style="font-size:.88rem;">
+            <p><strong>Thư viện:</strong> Thư viện số cộng đồng Yongin · 46 Bạch Đằng, Hải Châu, ĐN · Mã MARC: TVDN</p>
+            <p style="margin-top:6px;"><strong>Biên mục:</strong> DDC 23 · AACR2 · MARC21 · ISO 2709</p>
+            <p style="margin-top:6px;"><strong>Mượn/trả:</strong> 5 cuốn · 30 ngày · Phí 5.000đ/ngày · Gia hạn 1 lần</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📚 Danh mục chuẩn</h2></div>
+    <div class="card-body">
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>#</th><th>Danh mục</th><th>Mô tả</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>📖 Bảng Cutter</td><td>~80 vần tiếng Việt, mã số 100–566</td></tr>
+                    <tr><td>2</td><td>🌐 Mã ngôn ngữ</td><td>~60 ngôn ngữ (vie, eng, fre, chi, kor, jpn...)</td></tr>
+                    <tr><td>3</td><td>📚 DDC 23</td><td>Cây phân loại đầy đủ + chỉ số</td></tr>
+                    <tr><td>4</td><td>🏷️ Từ khóa TVQG</td><td>600, 610, 650, 651, 655</td></tr>
+                    <tr><td>5</td><td>📋 Quy tắc biên mục</td><td>AACR2, ISBD, TCVN7434-89</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- TAB 5: QUY TRÌNH -->
+<!-- ================================================================ -->
+<section id="process">
+<h2 class="section-title">🔄 Quy trình xử lý tài nguyên thông tin</h2>
+<p class="section-desc">8 bước chuẩn từ tiếp nhận đến bàn giao phục vụ — áp dụng cho toàn bộ tài liệu nhập mới.</p>
+
+<div class="card">
+    <div class="card-header"><h2>🗺️ 8 bước xử lý TNTT</h2></div>
+    <div class="card-body">
+        <div class="process-flow">
+            <span class="step"><span class="num">01</span> Tiếp nhận</span> <span class="arrow">→</span>
+            <span class="step"><span class="num">02</span> Xử lý sơ bộ</span> <span class="arrow">→</span>
+            <span class="step"><span class="num orange">03</span> Định ký hiệu</span> <span class="arrow">→</span>
+            <span class="step"><span class="num red">04</span> Biên mục</span>
+        </div>
+        <div class="process-flow">
+            <span class="step"><span class="num">08</span> Bàn giao</span> <span class="arrow">←</span>
+            <span class="step"><span class="num green">07</span> Kiểm tra</span> <span class="arrow">←</span>
+            <span class="step"><span class="num">06</span> Tải ảnh bìa</span> <span class="arrow">←</span>
+            <span class="step"><span class="num">05</span> In ấn, dán nhãn</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📋 Chi tiết từng bước</h2></div>
+    <div class="card-body">
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Bước</th><th>Quy trình</th><th>Mô tả</th><th>Module</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="badge blue">B01</span></td><td><strong>Tiếp nhận TNTT</strong></td><td>Đối chiếu danh mục, kiểm tra SL, ký nhận</td><td>acquisition</td></tr>
+                    <tr><td><span class="badge blue">B02</span></td><td><strong>Xử lý sơ bộ</strong></td><td>Phân loại hình thức/kho, đóng dấu, ghi ĐKCB</td><td>preprocessing</td></tr>
+                    <tr><td><span class="badge orange">B03</span></td><td><strong>Định ký hiệu</strong></td><td>Phân loại DDC 23, mã hóa Cutter, định từ khóa</td><td>classification</td></tr>
+                    <tr><td><span class="badge red">B04</span></td><td><strong>Biên mục MARC21</strong></td><td>Tra trùng → tải TVQG hoặc biên mục gốc</td><td>cataloging</td></tr>
+                    <tr><td><span class="badge blue">B05</span></td><td><strong>In ấn, dán nhãn</strong></td><td>In nhãn Môn loại + ĐKCB (mã vạch), dán RFID</td><td>printing</td></tr>
+                    <tr><td><span class="badge blue">B06</span></td><td><strong>Tải ảnh bìa</strong></td><td>Chụp/Scan bìa, upload vào biểu ghi</td><td>cataloging</td></tr>
+                    <tr><td><span class="badge green">B07</span></td><td><strong>Kiểm tra, xếp giá</strong></td><td>Hiệu đính thông tin, xếp giá theo ĐKCB</td><td>quality-control</td></tr>
+                    <tr><td><span class="badge blue">B08</span></td><td><strong>Bàn giao</strong></td><td>Chuyển bộ phận phục vụ bạn đọc</td><td>handover</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- TAB 6: MARC21 -->
+<!-- ================================================================ -->
+<section id="marc21">
+<h2 class="section-title">📝 Khổ mẫu MARC21</h2>
+<p class="section-desc">Chi tiết các trường MARC21 sử dụng trong biên mục tài nguyên thông tin tại Thư viện Yongin.</p>
+
+<div class="card">
+    <div class="card-header"><h2>🏗️ Cấu trúc biểu ghi MARC21</h2></div>
+    <div class="card-body">
+        <p>MARC21 = <strong>Ma</strong>chine <strong>R</strong>eadable <strong>C</strong>ataloging — Chuẩn trao đổi dữ liệu thư mục quốc tế. Một biểu ghi gồm <strong>3 thành phần</strong>:</p>
+        <div class="grid-3" style="margin-top:14px;">
+            <div class="feature"><h3>1. Đầu biểu (Leader)</h3><p>24 ký tự cố định: loại tài liệu, cấp thư mục, bộ mã ký tự, quy tắc biên mục...</p></div>
+            <div class="feature"><h3>2. Danh mục (Directory)</h3><p>Các mục trường 12 ký tự: nhãn, độ dài, vị trí bắt đầu của mỗi trường.</p></div>
+            <div class="feature"><h3>3. Trường dữ liệu</h3><p>Trường kiểm soát (00X) + trường dữ liệu (chỉ thị + trường con).</p></div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📊 Các khối trường MARC21</h2></div>
+    <div class="card-body">
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Khối</th><th>Chức năng</th><th>Ví dụ</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="badge purple">0XX</span></td><td>Kiểm soát, định danh, PL</td><td>020 (ISBN), 041 (Ngôn ngữ), 082 (DDC)</td></tr>
+                    <tr><td><span class="badge blue">1XX</span></td><td>Tiêu đề chính</td><td>100 (Tác giả CN), 110 (Tác giả tập thể)</td></tr>
+                    <tr><td><span class="badge green">2XX</span></td><td>Nhan đề &amp; liên quan</td><td>245 (Nhan đề), 260 (Xuất bản)</td></tr>
+                    <tr><td><span class="badge yellow">3XX</span></td><td>Mô tả vật lý</td><td>300 (Số trang, khổ)</td></tr>
+                    <tr><td><span class="badge">4XX</span></td><td>Tùng thư</td><td>490</td></tr>
+                    <tr><td><span class="badge red">5XX</span></td><td>Phụ chú</td><td>520 (Tóm tắt)</td></tr>
+                    <tr><td><span class="badge orange">6XX</span></td><td>Truy cập chủ đề</td><td>650 (Chủ đề), 651 (Địa danh)</td></tr>
+                    <tr><td><span class="badge purple">8XX</span></td><td>Nơi lưu trữ</td><td>852 (Nơi lưu trữ), 856 (URL)</td></tr>
+                    <tr><td><span class="badge">9XX</span></td><td>Cục bộ</td><td>910 (Người/Ngày khai)</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📄 Ví dụ biểu ghi MARC21 hoàn chỉnh</h2></div>
+    <div class="card-body">
+        <div class="mock-screen" style="white-space:normal;font-size:.82rem;">
+            <code>=LEADER 00869cam 2200265 a 4500<br>
+            =020  ##$a9786047767298$c169000đ$d1000b<br>
+            =041  0#$avie<br>
+            =082  04$a332.6324$bD430T$223<br>
+            =100  1#$aTrần Quốc Vượng<br>
+            =245  10$aVăn hóa Việt Nam /$cTrần Quốc Vượng<br>
+            =260  ##$aHà Nội :$bThanh niên,$c2023<br>
+            =300  ##$a456 tr. :$bminh hoạ ;$c24 cm<br>
+            =520  ##$aTrình bày một cái nhìn toàn cảnh về...</code>
+        </div>
+    </div>
+</div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- TAB 7: KIẾN TRÚC -->
+<!-- ================================================================ -->
+<section id="modules">
+<h2 class="section-title">🧩 Kiến trúc phân hệ &amp; Công nghệ</h2>
+<p class="section-desc">Cấu trúc module, sơ đồ quan hệ dữ liệu và đề xuất công nghệ cho Phần mềm Thư viện Yongin.</p>
+
+<div class="card">
+    <div class="card-header"><h2>💻 Tech Stack đề xuất</h2></div>
+    <div class="card-body">
+        <div class="grid-3">
+            <div class="feature"><h3>🎨 Frontend</h3><p><strong>Web:</strong> React + TypeScript + Ant Design<br><strong>Mobile:</strong> Flutter<br>Responsive, hỗ trợ tiếng Việt</p></div>
+            <div class="feature"><h3>⚙️ Backend</h3><p><strong>Ngôn ngữ:</strong> Node.js + Express<br><strong>Auth:</strong> JWT + RBAC<br>RESTful API</p></div>
+            <div class="feature"><h3>🗄️ Database</h3><p><strong>CSDL:</strong> PostgreSQL (Supabase)<br><strong>Search:</strong> Elasticsearch<br><strong>Cache:</strong> Redis<br><strong>File:</strong> MinIO/S3</p></div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>🔧 Đặc tả kỹ thuật quan trọng</h2></div>
+    <div class="card-body">
+        <div class="grid-2">
+            <div class="feature"><h3>📥 Import/Export</h3><p>ISO 2709 · MARC21 XML · Dublin Core · CSV/Excel</p></div>
+            <div class="feature"><h3>🔗 TVQG</h3><p>API tra cứu · tải biểu ghi · kiểm tra trùng · đồng bộ từ khóa</p></div>
+            <div class="feature"><h3>🔤 Xử lý tiếng Việt</h3><p>Unicode NFC/NFD · search không dấu · chính tả tiếng Việt</p></div>
+            <div class="feature"><h3>🔒 Bảo mật</h3><p>RBAC · phân quyền module/action · log hoạt động · mã hóa</p></div>
+        </div>
+    </div>
+</div>
+</section>
+
+</div>
+
+<div class="footer">
+    <p>© 2026 <strong>Thư viện số cộng đồng Yongin</strong> · 46 Bạch Đằng, Hải Châu, Đà Nẵng</p>
+    <p style="margin-top:4px;">Phần mềm Thư viện Yongin — Hệ thống quản lý thư viện số cộng đồng · <a href="#">Báo cáo vấn đề</a></p>
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+(function() {
+    const tabs = document.querySelectorAll('.nav-tabs a');
+    const sections = {
+        overview: document.getElementById('overview'),
+        reader: document.getElementById('reader'),
+        librarian: document.getElementById('librarian'),
+        admin: document.getElementById('admin'),
+        process: document.getElementById('process'),
+        marc21: document.getElementById('marc21'),
+        modules: document.getElementById('modules')
+    };
+
+    function showTab(tabId) {
+        tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+        Object.entries(sections).forEach(([key, el]) => el.classList.toggle('active', key === tabId));
+        window.location.hash = tabId;
+    }
+
+    tabs.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showTab(this.dataset.tab);
+        });
+    });
+
+    function checkHash() {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && sections[hash]) showTab(hash);
+    }
+
+    window.addEventListener('hashchange', checkHash);
+    window.addEventListener('load', checkHash);
+})();
+</script>
+
+</body>
+</html>
